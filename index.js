@@ -10,11 +10,12 @@ app.get('/', function (req, res) {
 
 var nameMap = {};
 app.get('/register/:name', (req, res)=>{
-	if(nameList[name]){
+	var name = req.params.name;
+	if(nameMap[name]){
 		res.status(404).send("Co nguoi dung ten nay roi");
 	}
 	else{
-    	nameList[name] = req.params.name;	
+    	nameMap[name] = 1;
     	res.status(200).send("Register thanh cong");
 	}
 })
