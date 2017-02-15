@@ -1,0 +1,22 @@
+{
+  "name": "video-chat-peerjs",
+  "version": "1.0.0",
+  "description": "Homework for multimedia communication course",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linhtran174/video-chat-peerjs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/linhtran174/video-chat-peerjs/issues"
+  },
+  "homepage": "https://github.com/linhtran174/video-chat-peerjs#readme",
+  "dependencies": {
+    "express": "^4.14.1"
+  }
+}
