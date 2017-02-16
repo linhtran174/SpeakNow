@@ -1,7 +1,11 @@
 var express = require('express'),
 	fs = require('fs')
-var app = express()
+	bodyParser = require('body-parser');
+	
+var app = express();
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function (req, res) {
   res.set('Content-Type', 'text/html');
@@ -18,6 +22,11 @@ app.get('/register/:name', (req, res)=>{
     	nameMap[name] = 1;
     	res.status(200).send("Register thanh cong");
 	}
+})
+
+app.post('/postId', (req,res)=>{
+	console.log(req.params);
+	console.log(req.body);
 })
 
 
