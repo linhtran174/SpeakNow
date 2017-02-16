@@ -1,57 +1,64 @@
 <html>
 <head>
 	<script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
+
 </head>
 <body style="margin: 0">
 	<div id="welcomeCover" style="position: fixed; width: 100%; height: 100%; background-color: black; padding-left: 50px; padding-top: 50px">
 
 		<input id="userName" type="text" placeholder="Điền tên vào đây" style="font-size: 20px; margin: 0; min-width: 150px; width: 20%; height: 40px">
 		<button id="enter" style="display: none; font-size: 20px; height: 40px" >Vào</button><br>
-		<p id="log" style="color: white">Initiating connection to peerJS cloud server</p>
+		<p id="log" style="color: lightgreen; font-size:20px"></p>
 	</div>
 	<div style="height: 100%; min-width: 150px; width: 20%; border-right: 2px solid black">
 		<p style="border-bottom: 2px solid black"> Đây là danh sách những người đang online</p>
 	</div>
 	
 	<script type="text/javascript">
+		//library
+		var log = document.getElementById('log');
+		log.count = 0;
+		log.max = 3;
+		log.add = function(text){
+			log.count++;
+			if(log.count == log.max){
+				log.innerHTML = 
+				log.innerHTML.substring(
+					log.innerHTML.indexOf('>')+1,
+					log.innerHTML.length
+				)
+				log.count--; 
+			}
+			log.innerHTML += text + "<br>";
+
+		}
+		var welcome = document.getElementById('welcomeCover');
+
+		//peerJS
 		var peer = new Peer({key: '6hh8b3c1io340a4i'});
 		var peerReady = false;
+		log.add('Initiating connection to peerJS cloud server...');
 		peer.on('open',(id)=>{
 			peerReady = true;
-			document.getElementById('log').innerHTML = 'Connection initiated. Id = ' + id;
+			log.add('Connection to peerJS cloud server initiated. peerId = ' + id);
 			document.getElementById('enter').style.display = "";
 		});
+		log.add('Initiating connection to user control server...');
+		var cServer = new WebSocket('ws://'+window.location.hostname+':3000');
+		cServer.addEventListener('open', (event)=>{
+			log.add('Connection to user control server initiated...');
+			cServer.send('Hahahahah');
+		})
 
 		document.getElementById('enter').onclick = function(){
 			var userName = document.getElementById('userName');
-			if(userName.value){
-				var welcome = document.getElementById('welcomeCover');
-				
-				//request get name 
-				var getName = new XMLHttpRequest();
-				getName.open('GET', '/register/'+ userName.value, false);
-				getName.send();
-				console.log(getName);
-				if(getName.status == 200){	
-
-					//post current id 
-					var postID = new XMLHttpRequest();
-					postID.open('POST', '/postId/', false);
-					postID.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-					postID.send("userName=" + userName.value + "&peerId=" + peer.id);					
-
-					localStorage['user'] = userName.value;
-					welcome.style.display = "none";	
-				}
-				else{
-
-				}
+			if(!userName.value){
+				alert("Điền tên vào đi!!");	
+				return;
 			}
-			else{
-				alert("Điền tên vào đi!!");
-			}
+
 		}
+
 		if(localStorage['user']){
 			document.getElementById('welcomeCover').display = "none";
 		}

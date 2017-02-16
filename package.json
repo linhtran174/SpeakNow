@@ -19,6 +19,7 @@
   "homepage": "https://github.com/linhtran174/video-chat-peerjs#readme",
   "dependencies": {
     "body-parser": "^1.16.1",
-    "express": "^4.14.1"
+    "express": "^4.14.1",
+    "uws": "^0.12.0"
   }
 }

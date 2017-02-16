@@ -1,35 +1,20 @@
-var express = require('express'),
-	fs = require('fs')
-	bodyParser = require('body-parser');
-	
-var app = express();
+var fs = require('fs'),
+	uws = require('uws');
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+var wss = new uws.Server({nativeHttp: true, port: 3000}),
+	http = require('http');
 
-app.get('/', function (req, res) {
-  res.set('Content-Type', 'text/html');
-  res.send(fs.readFileSync('index.html'));
-})
+server = http.createServer((req, res) => {
+	res.end(fs.readFileSync('index.html'));
+});
+server.listen(80);
+
+wss.on('connection', function(ws) {
+    console.log('ok, connection');
+});
+
+wss.on('error', function(error) {
+    console.log('Cannot start server');
+});
 
 var nameMap = {};
-app.get('/register/:name', (req, res)=>{
-	var name = req.params.name;
-	if(nameMap[name]){
-		res.status(404).send("Co nguoi dung ten nay roi");
-	}
-	else{
-    	nameMap[name] = 1;
-    	res.status(200).send("Register thanh cong");
-	}
-})
-
-app.post('/postId', (req,res)=>{
-	console.log(req.params);
-	console.log(req.body);
-})
-
-
-app.listen(80, function () {
-  console.log('Example app listening on port 80!')
-})
