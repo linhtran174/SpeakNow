@@ -8,22 +8,31 @@ server = http.createServer((req, res) => {
 }).listen(80);
 //////////////////END INIT SERVER//////////////////////////
 
+//library
+function strMapToObj(strMap) {
+	let obj = Object.create(null);
+    for (let [k,v] of strMap) {
+        obj[k] = v;
+    }
+    return obj;
+}
+
 
 var exampleUser = 
 {'Linh Tran' : {peerId: '1io340a4i6hh8b3c'}};
-var users = [];
+var usersMap = new Map();
 
 var processMessage = function(s, m){
 	m = JSON.parse(m);
 	if(m.newUser){
-		if(users[m.user.name]){
+		if(usersMap.has(m.user.name)){
 			s.send(JSON.stringify({
 				userExisted: true,
 				name: m.user.name
-			}))
+			}));
 		}
 		else{
-			users[m.user.name] = m.user.peerId;
+			usersMap.set(m.user.name, m.user.peerId);
 			console.log("registerSuccess");
 			s.send(JSON.stringify({
 				registerSuccess: true,
@@ -31,7 +40,7 @@ var processMessage = function(s, m){
 			}));
 			wss.clients.forEach(
 			(peer)=>{
-				if(peer.readyState !== uws.OPEN) return;
+				if(peer === s || peer.readyState !== uws.OPEN) return;
 				console.log("addUser");
 				peer.send(JSON.stringify({
 					addUser: true,
@@ -41,9 +50,9 @@ var processMessage = function(s, m){
 		}
 		return;
 	}
-	if(m.getUserLists){
-		user.send(JSON.stringify({
-			userList : users
+	if(m.getUsersMap){
+		s.send(JSON.stringify({
+			usersMap : strMapToObj(usersMap)
 		}));
 	}
 

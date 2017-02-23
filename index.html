@@ -1,137 +1,181 @@
 <html>
+
 <head>
-	<script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
-
+    <script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
 </head>
+
 <body style="margin: 0; background-color: black; color: white">
-	<div id="welcomeCover" style="position: fixed; width: 100%; height: 100%; background-color: black; padding-left: 50px; padding-top: 50px">
+    <div id="welcomeCover" style="z-index: 10; position: fixed; width: 100%; height: 100%; background-color: black; padding-left: 50px; padding-top: 50px">
+        <input id="userName" type="text" placeholder="Điền tên vào đây" style="font-size: 20px; margin: 0; min-width: 150px; width: 20%; height: 40px">
+        <button id="enter" style="display: none; font-size: 20px; height: 40px">Vào</button>
+        <br>
+        <p id="log" style="color: lightgreen; font-size:20px"></p>
+    </div>
+    <div id="onlineList" style="display: inline-block; vertical-align: top; height: 100%; min-width: 200px; width: 20%; border-right: 2px solid white">
+        <p style="border-bottom: 2px solid white; font-size: 20px; margin: 0"> Đây là danh sách những người đang online</p>
+    </div><video style="display: inline-block; width: calc(80% - 2px); min-width: 815px;" id="call-window"></video> 
+    <script type="text/javascript">
+    //library
+    var log = document.getElementById('log');
+    log.count = 0;
+    log.max = 5;
+    log.add = function(text) {
+        log.count++;
+        if (log.count == log.max) {
+            log.innerHTML =
+                log.innerHTML.substring(
+                    log.innerHTML.indexOf('>') + 1,
+                    log.innerHTML.length
+                )
+            log.count--;
+        }
+        log.innerHTML += text + "<br>";
+    }
 
-		<input id="userName" type="text" placeholder="Điền tên vào đây" style="font-size: 20px; margin: 0; min-width: 150px; width: 20%; height: 40px">
-		<button id="enter" style="display: none; font-size: 20px; height: 40px" >Vào</button><br>
-		<p id="log" style="color: lightgreen; font-size:20px"></p>
-	</div>
-	<div id="onlineList" style="height: 100%; min-width: 200px; width: 20%; border-right: 2px solid white">
-		<p style="border-bottom: 2px solid white; font-size: 20px; margin: 0"> Đây là danh sách những người đang online</p>
-		
-	</div>
-	
-	<script type="text/javascript">
-		//library
-		var log = document.getElementById('log');
-		log.count = 0;
-		log.max = 5;
-		log.add = function(text){
-			log.count++;
-			if(log.count == log.max){
-				log.innerHTML = 
-				log.innerHTML.substring(
-					log.innerHTML.indexOf('>')+1,
-					log.innerHTML.length
-				)
-				log.count--; 
-			}
-			log.innerHTML += text + "<br>";
+    function objToStrMap(obj) {
+		let strMap = new Map();
+		for (let k of Object.keys(obj)) {
+		    strMap.set(k, obj[k]);
 		}
+		return strMap;
+    }
+
+    //initDone 
+    var _initDone = [];
+    _initDone['peerjs'] = false;
+    _initDone['userControl'] = false;
+    var notifyDone = function(unit) {
+        _initDone[unit] = true;
+        if (_initDone['peerjs'] && _initDone['userControl'])
+            document.getElementById('enter').style.display = "";
+    }
+
+    //peerJS
+    var peer = new Peer({
+        key: '6hh8b3c1io340a4i'
+    });
+    log.add('Initiating connection to peerJS cloud server...');
+    peer.on('open', (id) => {
+        log.add('Connection to peerJS cloud server initiated. peerId = ' + id);
+        localStorage['peerId'] = id;
+        notifyDone('peerjs');
+    });
+
+    log.add('Initiating connection to user control server...');
+    var cServer = new WebSocket('ws://' + window.location.hostname + ':3000');
+    cServer.addEventListener('open', (event) => {
+        log.add('Connection to user control server initiated...');
+        notifyDone('userControl');
+    })
 
 
-		//initDone 
-		var _initDone = [];
-		_initDone['peerjs'] = false;
-		_initDone['userControl'] = false;
-		var notifyDone = function(unit){
-			_initDone[unit] = true;
-			if(_initDone['peerjs'] &&_initDone['userControl'])
-			document.getElementById('enter').style.display = "";
-		}
+    cServer.addEventListener('message', (m) => {
+        m = JSON.parse(m.data);
+        if (m.usersMap) {
+            userModel.map = objToStrMap(m.usersMap);
+            console.log(userModel.map);
+            userModel.map.forEach((peerId, name)=>{
+            	console.log(name, peerId);
+            	userModel.add({name: name, peerId: peerId});
+            })
+            return;
+        }
+        if (m.addUser) {
+            userModel.add(m.user);
+            return;
+        }
+        if (m.deleteUser) {
+            userModel.remove(m.user);
+            return;
+        }
+        if (m.userExisted) {
+            log.add("User " + m.name + " already existed. Please choose another name");
+        }
+        if (m.registerSuccess) {
+            log.add("User " + m.name + " successfully registered on the user control server");
+            document.getElementById('welcomeCover').style.display = "none";
+        }
+    });
 
-		//peerJS
-		var peer = new Peer({key: '6hh8b3c1io340a4i'});
-		log.add('Initiating connection to peerJS cloud server...');
-		peer.on('open',(id)=>{
-			log.add('Connection to peerJS cloud server initiated. peerId = ' + id);
-			localStorage['peerId'] = id;
-			notifyDone('peerjs');
-		});
+    document.getElementById('enter').onclick = function() {
+        var userName = document.getElementById('userName');
+        if (!userName.value) {
+            alert("Điền tên vào đi!!");
+            return;
+        }
+        var userName = document.getElementById('userName').value;
+        cServer.send(JSON.stringify({
+            newUser: true,
+            user: {
+                name: userName,
+                peerId: localStorage['peerId']
+            }
+        }));
 
-		log.add('Initiating connection to user control server...');
-		var cServer = new WebSocket('ws://'+window.location.hostname+':3000');
-		cServer.addEventListener('open', (event)=>{
-			log.add('Connection to user control server initiated...');
-			notifyDone('userControl');
-		})
+        cServer.send(JSON.stringify({
+            getUsersMap: true,
+        }));
+    }
 
+    //model - actually working with the UI
+    var userModel = {};
+    var exampleUser = {
+        'Linh Tran': {
+            peerId: '1io340a4i6hh8b3c'
+        }
+    };
 
-		cServer.addEventListener('message', (m)=>{
-			console.log(m);
-			m = JSON.parse(m.data);
-			if(m.userList){
-				userList.forEach((user)=>{
-					userModel.add(user);
-				})
-				return;
-			}
-			if(m.addUser){
-				userModel.add(m.user);
-				return;
-			}
-			if(m.deleteUser){
-				userModel.remove(m.user);
-				return;
-			}
-			if(m.userExisted){
-				log.add("User " + m.name + " already existed. Please choose another name");
-			}
-			if(m.registerSuccess){
-				log.add("User " + m.name +" successfully registered on the user control server");
-				document.getElementById('welcomeCover').style.display = "none";
-			}
-		});
+    userModel.map = new Map();
+    userModel.add = function(user) {
+        userModel.map.set(user.name, user.peerId);
 
-		document.getElementById('enter').onclick = function(){
-			var userName = document.getElementById('userName');
-			if(!userName.value){
-				alert("Điền tên vào đi!!");	
-				return;
-			}
-			var userName = document.getElementById('userName').value;
-			cServer.send(JSON.stringify({
-				newUser: true,
-				user: 
-					{name: userName,
-					peerId: localStorage['peerId']} 
-			}));
+        //update UI
+        console.log("User : " + JSON.stringify(user) + "added.");
 
-			cServer.send(JSON.stringify({
-				getUserList: true,
-			}));
-		}
-
-
-		//model - actually working with the UI
-		var userModel = {};
-		var exampleUser = {'Linh Tran' : {peerId: '1io340a4i6hh8b3c'}};
-		userModel.map = [];
-		userModel.add = function(user){
-			userModel.map[user.peerId] = user.name;
-
-			//update UI
-			console.log("User : " + JSON.stringify(user) + "added.");
-
-			var onlineList = document.getElementById('onlineList');
-			onlineList.innerHTML += 
-			'<div><p style="display: inline-block; width: 150px; text-overflow: ellipsis;">'+ user.name +'</p><button style="display: inline-block; width: 50px; border: 0; background-color: lightgreen">Goi</button></div>'
+        var onlineList = document.getElementById('onlineList');
+        onlineList.innerHTML +=
+            '<div><p style="display: inline-block; vertical-align: middle; min-width: 150px; width: 75%; text-overflow: ellipsis;">' + user.name + '</p><button onclick="call(' + user.peerId + ')" style="display: inline-block; min-height: 45px; vertical-align: top; min-width: 50px; width:25%; border: 0; background-color: lightgreen">Gọi ngay</button></div>';
+    }
+    userModel.remove = function(userName) {
+        userModel.map.delete(user.name);
+        //update UI
+        console.log("User : " + JSON.stringify(user) + "removed.");
+    }
 
 
+    var call = function(peerId) {
+        var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        getUserMedia({
+            video: true,
+            audio: true
+        }, function(stream) {
+            var call = peer.call(peerId, stream);
+            call.on('stream', function(remoteStream) {
+                // Show stream in some video/canvas element.
 
-		}
-		userModel.remove = function(userName){
-			delete userModel.map[userName];
-			//update UI
-			console.log("User : " + JSON.stringify(user) + "removed.");
-		}
-		
-	</script>	
-	
+            });
+        }, function(err) {
+            alert("Không cho access camera thì gọi cái gì?");
+
+        });
+    }
+
+    var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    peer.on('call', function(call) {
+        getUserMedia({
+            video: true,
+            audio: true
+        }, function(stream) {
+            call.answer(stream); // Answer the call with an A/V stream.
+            call.on('stream', function(remoteStream) {
+                // Show stream in some video/canvas element.
+
+            });
+        }, function(err) {
+            console.log('Failed to get local stream', err);
+        });
+    });
+    </script>
 </body>
-	
+
 </html>
