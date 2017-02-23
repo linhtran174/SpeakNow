@@ -3,22 +3,23 @@
 	<script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
 
 </head>
-<body style="margin: 0">
+<body style="margin: 0; background-color: black; color: white">
 	<div id="welcomeCover" style="position: fixed; width: 100%; height: 100%; background-color: black; padding-left: 50px; padding-top: 50px">
 
 		<input id="userName" type="text" placeholder="Điền tên vào đây" style="font-size: 20px; margin: 0; min-width: 150px; width: 20%; height: 40px">
 		<button id="enter" style="display: none; font-size: 20px; height: 40px" >Vào</button><br>
 		<p id="log" style="color: lightgreen; font-size:20px"></p>
 	</div>
-	<div style="height: 100%; min-width: 150px; width: 20%; border-right: 2px solid black">
-		<p style="border-bottom: 2px solid black"> Đây là danh sách những người đang online</p>
+	<div id="onlineList" style="height: 100%; min-width: 200px; width: 20%; border-right: 2px solid white">
+		<p style="border-bottom: 2px solid white; font-size: 20px; margin: 0"> Đây là danh sách những người đang online</p>
+		
 	</div>
 	
 	<script type="text/javascript">
 		//library
 		var log = document.getElementById('log');
 		log.count = 0;
-		log.max = 3;
+		log.max = 5;
 		log.add = function(text){
 			log.count++;
 			if(log.count == log.max){
@@ -30,25 +31,61 @@
 				log.count--; 
 			}
 			log.innerHTML += text + "<br>";
-
 		}
-		var welcome = document.getElementById('welcomeCover');
+
+
+		//initDone 
+		var _initDone = [];
+		_initDone['peerjs'] = false;
+		_initDone['userControl'] = false;
+		var notifyDone = function(unit){
+			_initDone[unit] = true;
+			if(_initDone['peerjs'] &&_initDone['userControl'])
+			document.getElementById('enter').style.display = "";
+		}
 
 		//peerJS
 		var peer = new Peer({key: '6hh8b3c1io340a4i'});
-		var peerReady = false;
 		log.add('Initiating connection to peerJS cloud server...');
 		peer.on('open',(id)=>{
-			peerReady = true;
 			log.add('Connection to peerJS cloud server initiated. peerId = ' + id);
-			document.getElementById('enter').style.display = "";
+			localStorage['peerId'] = id;
+			notifyDone('peerjs');
 		});
+
 		log.add('Initiating connection to user control server...');
 		var cServer = new WebSocket('ws://'+window.location.hostname+':3000');
 		cServer.addEventListener('open', (event)=>{
 			log.add('Connection to user control server initiated...');
-			cServer.send('Hahahahah');
+			notifyDone('userControl');
 		})
+
+
+		cServer.addEventListener('message', (m)=>{
+			console.log(m);
+			m = JSON.parse(m.data);
+			if(m.userList){
+				userList.forEach((user)=>{
+					userModel.add(user);
+				})
+				return;
+			}
+			if(m.addUser){
+				userModel.add(m.user);
+				return;
+			}
+			if(m.deleteUser){
+				userModel.remove(m.user);
+				return;
+			}
+			if(m.userExisted){
+				log.add("User " + m.name + " already existed. Please choose another name");
+			}
+			if(m.registerSuccess){
+				log.add("User " + m.name +" successfully registered on the user control server");
+				document.getElementById('welcomeCover').style.display = "none";
+			}
+		});
 
 		document.getElementById('enter').onclick = function(){
 			var userName = document.getElementById('userName');
@@ -56,14 +93,42 @@
 				alert("Điền tên vào đi!!");	
 				return;
 			}
+			var userName = document.getElementById('userName').value;
+			cServer.send(JSON.stringify({
+				newUser: true,
+				user: 
+					{name: userName,
+					peerId: localStorage['peerId']} 
+			}));
 
+			cServer.send(JSON.stringify({
+				getUserList: true,
+			}));
 		}
 
-		if(localStorage['user']){
-			document.getElementById('welcomeCover').display = "none";
-		}
-		
 
+		//model - actually working with the UI
+		var userModel = {};
+		var exampleUser = {'Linh Tran' : {peerId: '1io340a4i6hh8b3c'}};
+		userModel.map = [];
+		userModel.add = function(user){
+			userModel.map[user.peerId] = user.name;
+
+			//update UI
+			console.log("User : " + JSON.stringify(user) + "added.");
+
+			var onlineList = document.getElementById('onlineList');
+			onlineList.innerHTML += 
+			'<div><p style="display: inline-block; width: 150px; text-overflow: ellipsis;">'+ user.name +'</p><button style="display: inline-block; width: 50px; border: 0; background-color: lightgreen">Goi</button></div>'
+
+
+
+		}
+		userModel.remove = function(userName){
+			delete userModel.map[userName];
+			//update UI
+			console.log("User : " + JSON.stringify(user) + "removed.");
+		}
 		
 	</script>	
 	
