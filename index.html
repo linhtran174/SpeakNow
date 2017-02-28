@@ -1,6 +1,6 @@
 <html>
-
 <head>
+    <meta charset="UTF-8">
     <script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
 </head>
 
@@ -13,7 +13,9 @@
     </div>
     <div id="onlineList" style="display: inline-block; vertical-align: top; height: 100%; min-width: 200px; width: 20%; border-right: 2px solid white">
         <p style="border-bottom: 2px solid white; font-size: 20px; margin: 0"> Đây là danh sách những người đang online</p>
-    </div><video style="display: inline-block; width: calc(80% - 2px); min-width: 815px;" id="call-window"></video> 
+    </div>
+    <video style="display: inline-block; width: calc(30% - 2px); min-width: 200px;" id="incoming-video"></video> 
+    <video style="display: inline-block; width: calc(30% - 2px); min-width: 200px;" id="my-video"></video>
     <script type="text/javascript">
     //library
     var log = document.getElementById('log');
@@ -39,6 +41,9 @@
 		}
 		return strMap;
     }
+
+    //getUserMedia across browsers
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
     //initDone 
     var _initDone = [];
@@ -70,14 +75,12 @@
 
 
     cServer.addEventListener('message', (m) => {
+        console.log(m.data);
         m = JSON.parse(m.data);
-        if (m.usersMap) {
-            userModel.map = objToStrMap(m.usersMap);
-            console.log(userModel.map);
-            userModel.map.forEach((peerId, name)=>{
-            	console.log(name, peerId);
-            	userModel.add({name: name, peerId: peerId});
-            })
+        if (m.userList){
+            m.userList.forEach((user)=>{
+            	userModel.add(user);
+            });
             return;
         }
         if (m.addUser) {
@@ -85,7 +88,7 @@
             return;
         }
         if (m.deleteUser) {
-            userModel.remove(m.user);
+            userModel.remove(m.user.name);
             return;
         }
         if (m.userExisted) {
@@ -113,7 +116,7 @@
         }));
 
         cServer.send(JSON.stringify({
-            getUsersMap: true,
+            getUserList: true,
         }));
     }
 
@@ -127,6 +130,7 @@
 
     userModel.map = new Map();
     userModel.add = function(user) {
+        if(userModel.map.has(user.name)) return;
         userModel.map.set(user.name, user.peerId);
 
         //update UI
@@ -134,8 +138,9 @@
 
         var onlineList = document.getElementById('onlineList');
         onlineList.innerHTML +=
-            '<div><p style="display: inline-block; vertical-align: middle; min-width: 150px; width: 75%; text-overflow: ellipsis;">' + user.name + '</p><button onclick="call(' + user.peerId + ')" style="display: inline-block; min-height: 45px; vertical-align: top; min-width: 50px; width:25%; border: 0; background-color: lightgreen">Gọi ngay</button></div>';
+            '<div><p style="display: inline-block; vertical-align: middle; min-width: 150px; width: 75%; text-overflow: ellipsis;">' + user.name + '</p><button onclick="call(\'' + user.peerId + '\')" style="display: inline-block; min-height: 45px; vertical-align: top; min-width: 50px; width:25%; border: 0; background-color: lightgreen">Gọi ngay</button></div>';
     }
+
     userModel.remove = function(userName) {
         userModel.map.delete(user.name);
         //update UI
@@ -144,15 +149,22 @@
 
 
     var call = function(peerId) {
-        var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-        getUserMedia({
+        console.log('call('+peerId+') called');
+        
+        navigator.getUserMedia({
             video: true,
             audio: true
         }, function(stream) {
             var call = peer.call(peerId, stream);
-            call.on('stream', function(remoteStream) {
-                // Show stream in some video/canvas element.
 
+            var screen = document.getElementById('my-video');
+            screen.src = stream;  
+
+            call.on('stream', function(remoteStream) {
+                console.log("RemoteStream is on: ");
+                // Show stream in some video/canvas element.
+                screen = document.getElementById('incoming-video');
+                screen.src = remoteStream;
             });
         }, function(err) {
             alert("Không cho access camera thì gọi cái gì?");
@@ -160,19 +172,24 @@
         });
     }
 
-    var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
     peer.on('call', function(call) {
-        getUserMedia({
+        console.log("Someone is calling: ", call);
+        navigator.getUserMedia({
             video: true,
             audio: true
         }, function(stream) {
+            
+            var screen = document.getElementById('my-video');
+            screen.src = stream;  
+
             call.answer(stream); // Answer the call with an A/V stream.
             call.on('stream', function(remoteStream) {
                 // Show stream in some video/canvas element.
-
+                screen = document.getElementById('incoming-video');
+                screen.src = remoteStream;
             });
         }, function(err) {
-            console.log('Failed to get local stream', err);
+            alert('Không cho access camera thì gọi cái gì?');
         });
     });
     </script>

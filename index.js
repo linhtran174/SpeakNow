@@ -17,23 +17,20 @@ function strMapToObj(strMap) {
     return obj;
 }
 
-
-var exampleUser = 
-{'Linh Tran' : {peerId: '1io340a4i6hh8b3c'}};
 var usersMap = new Map();
 
 var processMessage = function(s, m){
 	m = JSON.parse(m);
 	if(m.newUser){
-		if(usersMap.has(m.user.name)){
+		if(usersMap.has(s) || usersMap.has(m.user.name)){
 			s.send(JSON.stringify({
 				userExisted: true,
 				name: m.user.name
 			}));
 		}
 		else{
-			usersMap.set(m.user.name, m.user.peerId);
-			console.log("registerSuccess");
+			usersMap.set(s, {name: m.user.name, peerId: m.user.peerId});
+			//console.log("registerSuccess");
 			s.send(JSON.stringify({
 				registerSuccess: true,
 				name: m.user.name
@@ -41,7 +38,7 @@ var processMessage = function(s, m){
 			wss.clients.forEach(
 			(peer)=>{
 				if(peer === s || peer.readyState !== uws.OPEN) return;
-				console.log("addUser");
+				//console.log("addUser");
 				peer.send(JSON.stringify({
 					addUser: true,
 					user: m.user
@@ -50,15 +47,28 @@ var processMessage = function(s, m){
 		}
 		return;
 	}
-	if(m.getUsersMap){
+	if(m.getUserList){
+		var userList = [];
+		usersMap.forEach((user, socket)=>{
+			userList.push(user);
+		})
 		s.send(JSON.stringify({
-			usersMap : strMapToObj(usersMap)
+			userList : userList
 		}));
+		return;
 	}
-
 }
 
-
+wss.on('disconnection', (me)=>{
+	wss.clients.forEach((client)=>{
+		if(client === me || client.readyState !== uws.OPEN) return;
+		console.log('delUser');
+		client.send(JSON.stringify({
+			deleteUser : true,
+			user: usersMap.get(me)
+		}));
+	});
+});
 
 wss.on('connection', function(socket) {
 	socket.on('message', (message)=>{
@@ -74,4 +84,3 @@ wss.on('error', function(error) {
     console.log('Cannot start server');
 });
 
-var nameMap = {};
