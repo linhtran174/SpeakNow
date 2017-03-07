@@ -1,7 +1,6 @@
 var fs = require('fs'),
-	uws = require('uws');
-var wss = new uws.Server({nativeHttp: true, port: 3000}),
-	http = require('http');
+	uws = require('uws'),
+	http = require('http'),
 	https = require('https');
 
 
@@ -10,9 +9,11 @@ var sslCerl = {
 	cert: fs.readFileSync('SSL_cert/domain-crt.txt')
 }
 
-https.createServer(sslCerl, (req,res)=>{
+var server = https.createServer(sslCerl, (req,res)=>{
 	res.end(fs.readFileSync('index.html'));
 }).listen(443);
+
+var wss = new uws.Server({server: server, port: 3000});
 
 //return AMCE_reponse{ "text": <responseText>} if the request is a ACME challenge
 var AMCE_Challenge = function(req){
@@ -36,6 +37,7 @@ http.createServer((req, res) => {
 		res.writeHead(301,{
 			'Location' : 'https://xseed.tech'
 		});
+		res.end();
 	}
 
 }).listen(80);

@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.min.js"></script>
 </head>
 
 <body style="margin: 0; background-color: black; color: white">
@@ -67,7 +67,7 @@
     });
 
     log.add('Initiating connection to user control server...');
-    var cServer = new WebSocket('ws://' + window.location.hostname + ':3000');
+    var cServer = new WebSocket('wss://' + window.location.hostname + ':443');
     cServer.addEventListener('open', (event) => {
         log.add('Connection to user control server initiated...');
         notifyDone('userControl');
