@@ -3,10 +3,29 @@ var fs = require('fs'),
 var wss = new uws.Server({nativeHttp: true, port: 3000}),
 	http = require('http');
 
+//return AMCE_reponse{ "text": <responseText>} if the request is a ACME challenge
+var AMCE_Challenge = function(req){
+	if(req.url == "/.well-known/acme-challenge/XD0ccAIWW4MHFr7cBQ_pTD7Y1r0dDSzT9Wiy36m2Ejw")
+		return { text:
+		 "XD0ccAIWW4MHFr7cBQ_pTD7Y1r0dDSzT9Wiy36m2Ejw.wTz1G0JCJRVKSFedh2VPiCGquf2YwBfr0Ega2C0FQH0"};
+	if(req.url == "/.well-known/acme-challenge/QFyek2FGSTU3BKDxNQ7MglBQ4auN9bS9idejPffpmdw")
+		return { text: 
+		 "QFyek2FGSTU3BKDxNQ7MglBQ4auN9bS9idejPffpmdw.wTz1G0JCJRVKSFedh2VPiCGquf2YwBfr0Ega2C0FQH0"};
+	return null;
+}
+
 server = http.createServer((req, res) => {
-	res.end(fs.readFileSync('index.html'));
+	console.log(req.url);
+	var challenge = AMCE_Challenge(req);
+	if(challenge){
+		res.end(challenge.text);
+	}
+	else
+		res.end(fs.readFileSync('index.html'));
+
 }).listen(80);
 //////////////////END INIT SERVER//////////////////////////
+
 
 //library
 function strMapToObj(strMap) {
