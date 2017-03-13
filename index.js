@@ -1,6 +1,5 @@
-var fs = require('fs'),
-	uws = require('uws'),
-	http = require('lib/initServer');
+var uws = require('uws'),
+	http = require('./lib/initServer');
 
 var wss = new uws.Server({server: http, port: 3000});
 //////////////////END INIT SERVER//////////////////////////
