@@ -1,7 +1,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.min.js"></script>
 </head>
 
 <body style="margin: 0; background-color: black; color: white">
@@ -45,26 +44,22 @@
     //getUserMedia across browsers
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
+
+    //WebRTC configuration
+    var config = {iceServers:[{urls: "stun:xseed.tech"}]}
+    var pc = new RTCPeerConnection(config);
+
+
     //initDone 
-    var _initDone = [];
-    _initDone['peerjs'] = false;
-    _initDone['userControl'] = false;
+    var _initDone = {
+        'userControl': false
+    };
     var notifyDone = function(unit) {
         _initDone[unit] = true;
-        if (_initDone['peerjs'] && _initDone['userControl'])
+        if (_initDone['userControl'])
             document.getElementById('enter').style.display = "";
     }
 
-    //peerJS
-    var peer = new Peer({
-        key: '6hh8b3c1io340a4i'
-    });
-    log.add('Initiating connection to peerJS cloud server...');
-    peer.on('open', (id) => {
-        log.add('Connection to peerJS cloud server initiated. peerId = ' + id);
-        localStorage['peerId'] = id;
-        notifyDone('peerjs');
-    });
 
     log.add('Initiating connection to user control server...');
     var cServer = new WebSocket('wss://' + window.location.hostname + ':443');
@@ -172,26 +167,26 @@
         });
     }
 
-    peer.on('call', function(call) {
-        console.log("Someone is calling: ", call);
-        navigator.getUserMedia({
-            video: true,
-            audio: true
-        }, function(stream) {
+    // peer.on('call', function(call) {
+    //     console.log("Someone is calling: ", call);
+    //     navigator.getUserMedia({
+    //         video: true,
+    //         audio: true
+    //     }, function(stream) {
             
-            var screen = document.getElementById('my-video');
-            screen.src = stream;  
+    //         var screen = document.getElementById('my-video');
+    //         screen.src = stream;  
 
-            call.answer(stream); // Answer the call with an A/V stream.
-            call.on('stream', function(remoteStream) {
-                // Show stream in some video/canvas element.
-                screen = document.getElementById('incoming-video');
-                screen.src = remoteStream;
-            });
-        }, function(err) {
-            alert('Không cho access camera thì gọi cái gì?');
-        });
-    });
+    //         call.answer(stream); // Answer the call with an A/V stream.
+    //         call.on('stream', function(remoteStream) {
+    //             // Show stream in some video/canvas element.
+    //             screen = document.getElementById('incoming-video');
+    //             screen.src = remoteStream;
+    //         });
+    //     }, function(err) {
+    //         alert('Không cho access camera thì gọi cái gì?');
+    //     });
+    // });
     </script>
 </body>
 

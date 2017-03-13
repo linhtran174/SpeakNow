@@ -18,10 +18,10 @@ var wss = new uws.Server({server: server, port: 3000});
 //return AMCE_reponse{ "text": <responseText>} if the request is a ACME challenge
 var AMCE_Challenge = function(req){
 	if(req.url == "/.well-known/acme-challenge/XD0ccAIWW4MHFr7cBQ_pTD7Y1r0dDSzT9Wiy36m2Ejw")
-		return { text:
+		return { responseText:
 		 "XD0ccAIWW4MHFr7cBQ_pTD7Y1r0dDSzT9Wiy36m2Ejw.wTz1G0JCJRVKSFedh2VPiCGquf2YwBfr0Ega2C0FQH0"};
 	if(req.url == "/.well-known/acme-challenge/QFyek2FGSTU3BKDxNQ7MglBQ4auN9bS9idejPffpmdw")
-		return { text: 
+		return { responseText: 
 		 "QFyek2FGSTU3BKDxNQ7MglBQ4auN9bS9idejPffpmdw.wTz1G0JCJRVKSFedh2VPiCGquf2YwBfr0Ega2C0FQH0"};
 	return null;
 }
@@ -30,7 +30,7 @@ http.createServer((req, res) => {
 	console.log(req.url);
 	var challenge = AMCE_Challenge(req);
 	if(challenge){
-		res.end(challenge.text);
+		res.end(challenge.responseText);
 	}
 	else{
 		//redirect to HTTPS
@@ -39,7 +39,6 @@ http.createServer((req, res) => {
 		});
 		res.end();
 	}
-
 }).listen(80);
 
 //////////////////END INIT SERVER//////////////////////////
