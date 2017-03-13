@@ -43,7 +43,15 @@
     }
 
     //getUserMedia across browsers
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    function getUserMedia(options, success, error){
+        if(navigator.getUserMedia){
+            navigator.getUserMedia(options, success, error);
+        }
+        else if(navigator.mediaDevices){
+            navigator.mediaDevices.getUserMedia(options, success, error);
+        }
+        // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia;
+    }
 
     //initDone 
     var _initDone = [];
@@ -136,12 +144,14 @@
 
         var onlineList = document.getElementById('onlineList');
         onlineList.innerHTML +=
-            '<div><p style="display: inline-block; vertical-align: middle; min-width: 150px; width: 75%; text-overflow: ellipsis;">' + user.name + '</p><button onclick="call(\'' + user.peerId + '\')" style="display: inline-block; min-height: 45px; vertical-align: top; min-width: 50px; width:25%; border: 0; background-color: lightgreen">Gọi ngay</button></div>';
+            '<div id="'+ user.name + '"><p style="display: inline-block; vertical-align: middle; min-width: 150px; width: 75%; text-overflow: ellipsis;">' + user.name + '</p><button onclick="call(\'' + user.peerId + '\')" style="display: inline-block; min-height: 45px; vertical-align: top; min-width: 50px; width:25%; border: 0; background-color: lightgreen">Gọi ngay</button></div>';
     }
 
     userModel.remove = function(userName) {
+        var userSlot = document.getElementById(userName);
+        var onlineList = document.getElementById('onlineList');
+        onlineList.remove(userSlot);
         userModel.map.delete(user.name);
-        //update UI
         console.log("User : " + JSON.stringify(user) + "removed.");
     }
 
@@ -149,20 +159,21 @@
     var call = function(peerId) {
         console.log('call('+peerId+') called');
         
-        navigator.getUserMedia({
+        getUserMedia({
             video: true,
             audio: true
         }, function(stream) {
+            console.log("got Stream");
             var call = peer.call(peerId, stream);
 
             var screen = document.getElementById('my-video');
-            screen.src = stream;  
+            screen.srcObject = stream;  
 
             call.on('stream', function(remoteStream) {
                 console.log("RemoteStream is on: ");
                 // Show stream in some video/canvas element.
                 screen = document.getElementById('incoming-video');
-                screen.src = remoteStream;
+                screen.srcObject = remoteStream;
             });
         }, function(err) {
             alert("Không cho access camera thì gọi cái gì?");
@@ -172,19 +183,19 @@
 
     peer.on('call', function(call) {
         console.log("Someone is calling: ", call);
-        navigator.getUserMedia({
+        getUserMedia({
             video: true,
             audio: true
         }, function(stream) {
             
             var screen = document.getElementById('my-video');
-            screen.src = stream;  
+            screen.srcObject = stream;  
 
             call.answer(stream); // Answer the call with an A/V stream.
             call.on('stream', function(remoteStream) {
                 // Show stream in some video/canvas element.
                 screen = document.getElementById('incoming-video');
-                screen.src = remoteStream;
+                screen.srcObject = remoteStream;
             });
         }, function(err) {
             alert('Không cho access camera thì gọi cái gì?');
