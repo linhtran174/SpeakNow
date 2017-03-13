@@ -56,12 +56,10 @@
     }
 
     //peerJS
-    var peer = new Peer({
-        key: '6hh8b3c1io340a4i'
-    });
-    log.add('Initiating connection to peerJS cloud server...');
+    var peer = new Peer({host: 'xseed.tech', secure: true});
+    log.add('Initiating connection to peerJS broker server...');
     peer.on('open', (id) => {
-        log.add('Connection to peerJS cloud server initiated. peerId = ' + id);
+        log.add('Connection to peerJS server initiated. peerId = ' + id);
         localStorage['peerId'] = id;
         notifyDone('peerjs');
     });
