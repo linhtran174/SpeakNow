@@ -1,7 +1,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/adapterjs/0.13.4/adapter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
 </head>
 
 <body style="margin: 0; background-color: black; color: white">
@@ -43,15 +44,18 @@
     }
 
     //getUserMedia across browsers
-    function getUserMedia(options, success, error){
-        if(navigator.getUserMedia){
-            navigator.getUserMedia(options, success, error);
-        }
-        else if(navigator.mediaDevices){
-            navigator.mediaDevices.getUserMedia(options, success, error);
-        }
-        // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia;
-    }
+    // var getUserMedia = navigator.getUserMedia;
+    // function getUserMedia(options, success, error){
+    //     if(navigator.getUserMedia){
+    //         console.log("default API");
+    //         navigator.getUserMedia(options, success, error);
+    //     }
+    //     else if(navigator.mediaDevices){
+    //         console.log("firefox API");
+    //         navigator.mediaDevices.getUserMedia(options, success, error);
+    //     }
+    //     // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia;
+    // }
 
     //initDone 
     var _initDone = [];
@@ -126,13 +130,13 @@
         }));
     }
 
-    //model - actually working with the UI
+    
     var userModel = {};
-    var exampleUser = {
-        'Linh Tran': {
-            peerId: '1io340a4i6hh8b3c'
-        }
-    };
+    // var exampleUser = {
+    //     'Linh Tran': {
+    //         peerId: '1io340a4i6hh8b3c'
+    //     }
+    // };
 
     userModel.map = new Map();
     userModel.add = function(user) {
@@ -159,7 +163,7 @@
     var call = function(peerId) {
         console.log('call('+peerId+') called');
         
-        getUserMedia({
+        navigator.getUserMedia({
             video: true,
             audio: true
         }, function(stream) {
@@ -167,7 +171,7 @@
             var call = peer.call(peerId, stream);
 
             var screen = document.getElementById('my-video');
-            screen.srcObject = stream;  
+            screen.srcObject = stream.getVideoTracks;  
 
             call.on('stream', function(remoteStream) {
                 console.log("RemoteStream is on: ");
@@ -177,19 +181,19 @@
             });
         }, function(err) {
             alert("Không cho access camera thì gọi cái gì?");
-
+            console.log(err);
         });
     }
 
     peer.on('call', function(call) {
         console.log("Someone is calling: ", call);
-        getUserMedia({
+        navigator.getUserMedia({
             video: true,
             audio: true
         }, function(stream) {
             
             var screen = document.getElementById('my-video');
-            screen.srcObject = stream;  
+            screen.srcObject = stream.getVideoTracks;  
 
             call.answer(stream); // Answer the call with an A/V stream.
             call.on('stream', function(remoteStream) {
@@ -198,9 +202,19 @@
                 screen.srcObject = remoteStream;
             });
         }, function(err) {
+            console.log(err);
             alert('Không cho access camera thì gọi cái gì?');
         });
     });
+
+    function myConfirmation() {
+        if(confirm('Sure to quit? :( ')){
+            cServer.close();
+            window.close();
+        }
+    }
+
+    window.onbeforeunload = myConfirmation;
     </script>
 </body>
 

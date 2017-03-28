@@ -49,7 +49,7 @@ wss.on('disconnection', (me)=>{
 	console.log('disconnection');
 	wss.clients.forEach((client)=>{
 		if(client === me || client.readyState !== uws.OPEN) return;
-		console.log('delUser');
+
 		client.send(JSON.stringify({
 			deleteUser : true,
 			user: usersMap.get(me)
@@ -57,7 +57,10 @@ wss.on('disconnection', (me)=>{
 	});
 });
 
+
+
 wss.on('connection', function(socket) {
+	socket
 	socket.on('message', (message)=>{
 		processMessage(socket, message);
 	});
