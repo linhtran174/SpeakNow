@@ -9,8 +9,8 @@ var fs = require('fs');
 require('peer').PeerServer({
   port: 9000,
   ssl: {
-    key: fs.readFileSync('/xseed.tech.key'),
-    cert: fs.readFileSync('/xseed.tech.crt')
+    key: fs.readFileSync('SSL_cert/xseed.tech.key'),
+    cert: fs.readFileSync('SSL_cert/xseed.tech.crt')
   }
 });
 //////////////////END INIT SERVER//////////////////////////
