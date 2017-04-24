@@ -2,6 +2,17 @@ var uws = require('uws'),
 	http = require('./lib/initServer');
 
 var wss = new uws.Server({server: http, port: 3000});
+
+var fs = require('fs');
+
+//run peer server
+require('peer').PeerServer({
+  port: 9000,
+  ssl: {
+    key: fs.readFileSync('/xseed.tech.key'),
+    cert: fs.readFileSync('/xseed.tech.crt')
+  }
+});
 //////////////////END INIT SERVER//////////////////////////
 var usersMap = new Map();
 
