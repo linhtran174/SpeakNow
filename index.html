@@ -16,7 +16,7 @@
         <p style="border-bottom: 2px solid white; font-size: 20px; margin: 0"> Đây là danh sách những người đang online</p>
     </div>
     <video style="display: inline-block; width: calc(30% - 2px); min-width: 200px;" id="incoming-video" autoplay></video> 
-    <video style="display: inline-block; width: calc(30% - 2px); min-width: 200px;" id="my-video" autoplay></video>
+    <video style="display: inline-block; width: calc(30% - 2px); min-width: 200px;" id="my-video" muted="true" autoplay></video>
     <script type="text/javascript">
     //library
     var log = document.getElementById('log');
@@ -171,9 +171,7 @@
             var call = peer.call(peerId, stream);
 
             var screen = document.getElementById('my-video');
-            var withoutAudio = stream.clone();
-            withoutAudio.removeTrack(withoutAudio.getAudioTracks[0]);
-            screen.srcObject = withoutAudio;  
+            screen.srcObject = stream;  
 
             call.on('stream', function(remoteStream) {
                 console.log("RemoteStream is on: ");
@@ -195,9 +193,7 @@
         }, function(stream) {
             
             var screen = document.getElementById('my-video');
-            var withoutAudio = stream.clone();
-            withoutAudio.removeTrack(withoutAudio.getAudioTracks[0]);
-            screen.srcObject = withoutAudio;  
+            screen.srcObject = stream;  
 
             call.answer(stream); // Answer the call with an A/V stream.
             call.on('stream', function(remoteStream) {
