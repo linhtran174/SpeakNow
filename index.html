@@ -171,8 +171,9 @@
             var call = peer.call(peerId, stream);
 
             var screen = document.getElementById('my-video');
-            stream.removeTrack(stream.getAudioTracks()[0]);
-            screen.srcObject = stream;  
+            var withoutAudio = stream.clone();
+            withoutAudio.removeTrack(withoutAudio.getAudioTracks[0]);
+            screen.srcObject = withoutAudio;  
 
             call.on('stream', function(remoteStream) {
                 console.log("RemoteStream is on: ");
@@ -194,8 +195,9 @@
         }, function(stream) {
             
             var screen = document.getElementById('my-video');
-            stream.removeTrack(stream.getAudioTracks()[0]);
-            screen.srcObject = stream;  
+            var withoutAudio = stream.clone();
+            withoutAudio.removeTrack(withoutAudio.getAudioTracks[0]);
+            screen.srcObject = withoutAudio;  
 
             call.answer(stream); // Answer the call with an A/V stream.
             call.on('stream', function(remoteStream) {

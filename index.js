@@ -1,7 +1,7 @@
-var ws = require('uws'),
+var uws = require('uws'),
 	https = require('./lib/initServer');
 
-var wss = new ws.Server({server: https});
+var wss = new uws.Server({server: https});
 
 var fs = require('fs');
 
@@ -71,6 +71,7 @@ wss.on('disconnection', (me)=>{
 
 
 wss.on('connection', function(socket) {
+	console.log(socket);
 	socket.on('message', (message)=>{
 		processMessage(socket, message);
 	});
