@@ -171,6 +171,7 @@
             var call = peer.call(peerId, stream);
 
             var screen = document.getElementById('my-video');
+            stream.removeTrack(stream.getAudioTracks()[0]);
             screen.srcObject = stream;  
 
             call.on('stream', function(remoteStream) {
@@ -193,6 +194,7 @@
         }, function(stream) {
             
             var screen = document.getElementById('my-video');
+            stream.removeTrack(stream.getAudioTracks()[0]);
             screen.srcObject = stream;  
 
             call.answer(stream); // Answer the call with an A/V stream.
