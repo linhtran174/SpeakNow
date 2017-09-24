@@ -1,0 +1,145 @@
+<html lang="en-VN">
+<head>
+<style>
+	button{
+		border: none;
+		height: 40px;
+	}
+	h3{
+		margin: 0;
+	}
+</style>
+
+</head>
+
+<body style="margin: 0; display: flex; flex-direction: column">
+
+	
+    <div id="videoBox" style="position: fixed; top: 50px; right: 15px; width: 400px; min-width: 200px; cursor: move; border: 2px dotted black; transform: translate(0px,0px);">
+    	<p style="height: 100px">Peer's video will be placed here. This box can be dragged</p>
+    	<video id="my-video" muted="true" style = "width: 120px; min-width: 50px;" autoplay>
+    </div>
+	<div id="interviewer" style = "display: flex; flex-direction: column">
+		<div id="controlPanel" style="width: 100%; height: 40px; border-bottom: 2px solid black;">
+			<h3 style="display: inline-block; padding-top: 10px; padding-left: 150px; width: 500px">You are currently the interviewer.</h3>
+			<button style="float: right; margin-right: 20px; background-color: red; color: white;">End interview</button>
+			<button style="float: right; margin-right: 20px; background-color: blue; color: white">Swap role</button>
+		</div>
+		<div style="width: 100%; height: calc(100% - 42px);">
+			<div id="questionPanel" style="width: 40%; height: 100%; display: inline-block; border-right: 1px dotted black;">
+			<div style="height: 30px; font-size:20px">Question & suggested answer</div>
+			<button id="part1" style="width: 32%; height: 30px; display: inline-block" onclick="loadTest(1)">Part 1</button>
+			<button id="part2" style="width: 32%; height: 30px; display: inline-block" onclick="loadTest(2)">Part 2</button>
+			<button id="part3" style="width: 32%; height: 30px; display: inline-block" onclick="loadTest(3)">Part 3</button>
+			<p id="part1Text" style="margin: 0; padding-top: 10px; padding-left: 6px; height: calc(100% - 74px); overflow-y: scroll;">
+				<b>What is your full name?</b><br>
+				My name is Asami Takashi <br>
+				<br>
+				<b>Can I see your ID?</b><br>
+				Yes, here's my identification. Do you work or study?<br>
+				<br>
+				<b>I am a student. What city are you from?</b><br>
+				I'm from Osaka<br>
+				<br>
+				<b>Where is it located exactly?</b><br>
+				Osaka is in the Kansai region of Honshu, Japan's main island. It is located on the Yodo River on Osaka Bay, it's the third largest city in Japan.  <br>
+				<br>
+				<b>Do you like living there?</b><br>
+				Yes, I do, I think it's a lovely place.  <br>
+				<br>
+				<b>Tell me some interesting facts about it.</b><br>
+				Okay, well, Osaka is considered to be one of the economic centers of Japan and in the past it was famous as a trading center, especially for rice, and was where the first modern futures market developed.<br>
+				<br>
+				<b>Are there many large cities in your country?</b><br>
+				Not all of them are large, I think there are ten cities which have more than 1 million people living in them. The three largest ones are Tokyo, then Yokohama, Osaka and Nagoya. These are the largest cities and have more than 2 million people living in them. The other cities are smaller. 
+
+				<b>What is your full name?</b><br>
+				My name is Asami Takashi <br>
+				<br>
+				<b>Can I see your ID?</b><br>
+				Yes, here's my identification. Do you work or study?<br>
+				<br>
+				<b>I am a student. What city are you from?</b><br>
+				I'm from Osaka<br>
+				<br>
+				<b>Where is it located exactly?</b><br>
+				Osaka is in the Kansai region of Honshu, Japan's main island. It is located on the Yodo River on Osaka Bay, it's the third largest city in Japan.  <br>
+				<br>
+				<b>Do you like living there?</b><br>
+				Yes, I do, I think it's a lovely place.  <br>
+				<br>
+				<b>Tell me some interesting facts about it.</b><br>
+				Okay, well, Osaka is considered to be one of the economic centers of Japan and in the past it was famous as a trading center, especially for rice, and was where the first modern futures market developed.<br>
+				<br>
+				<b>Are there many large cities in your country?</b><br>
+				Not all of them are large, I think there are ten cities which have more than 1 million people living in them. The three largest ones are Tokyo, then Yokohama, Osaka and Nagoya. These are the largest cities and have more than 2 million people living in them. The other cities are smaller. 
+			</p>
+			<p id="part2Text" style="margin: 0; padding-top: 10px; padding-left: 6px; height: calc(100% - 74px); overflow-y: scroll; display: none">
+				<b>Describe the thing that you cannot live without (except phone and internet). </b><br>
+				<br>
+				<br>
+				<b>Please say: </b><br>
+				- What is it?<br>
+				- Why can’t you manage without it?<br>
+				- How long have you had it for?<br>
+				- How did you feel when you were without it?<br>
+				<br>
+				<br>
+				<b>Sample answer:</b><br>
+				<br>
+				I would have to say my car. Public transport in Japan is not so conevenient and sometimes infrequent so havng a car is the preferred choice for getting around, especially if you have to travel to various places. I use my car mainly to go from my home to university and back. But at the moment I'm also workig as a part-time intern in a local business so I have to go there three afternoons a week as well. Trying to do all that by using public trasport would be almost impossible and would take a lot more time. I've had my car for about two years now, it's a Toyota Prius and I love it. It's very comfortable and well equipped and it's also easy to park and economical to run. I can't imagine having to do all the things I do normally without having my car.<br>
+				But a few months ago there was a problem with it. I noticed a strange noise coming from the front of the car one day. At first I ignored it, but then it gradually became worse and worse. I told my brother about it and he arranged for the car to be inspected by the mechanic. I'm not a very technical person , but apparently there was a problem with the suspension and they had to replace a part. That is the only problem I've ever had with it. The bad news was that they had to order the part specially and I was without my car for about ten days in total. It made my daily activities very difficult, and I didn't really like using the public transport at all. It wasted so much time.<br>
+				I was surprised how quickly I had gotten used to having my car and just how convenient it is. I hope that in the future I don't have any more problems with it. It really is an essential part of my life and I don't want to be without it again.
+			</p>
+			<p id="part3Text" style="margin: 0; padding-top: 10px; padding-left: 6px; height: calc(100% - 74px); overflow-y: scroll; display: none">
+			</p>
+			</div><div id="chatPanel" style="width: calc(60% - 1px); height: 100%; display: inline-block; vertical-align: top">
+				<div id="textScreen" style="height: calc(100% - 45px);"></div>
+				<input id="typingText" type="text" style="height: 40px; width: 100%; display: inline-block; position: relative; bottom: 0px; left: 0px; padding-left: 10px" placeholder="Chat here! Press enter to send chat!">
+
+			</div>
+
+		</div>
+	</div>
+
+	<div id="interviewee"></div>
+<script type="text/javascript">
+	var activeTest = document.getElementById("part1Text");
+	function loadTest(testNumber){
+		activeTest.style.display = "none";
+		activeTest = document.getElementById("part"+testNumber+"Text");
+		activeTest.style.display = "";
+	}
+
+	navigator.getUserMedia({
+        video: true,
+        audio: true
+    }, function(stream) {
+        
+        var screen = document.getElementById('my-video');
+        screen.srcObject = stream;
+    },function(err) {
+        console.log(err);
+        alert('Không cho access camera thì gọi cái gì?');
+    });
+
+	var dragger = null;
+	document.getElementById("videoBox").onmousedown = (e)=>{
+		dragger = document.getElementById("videoBox");
+	}
+
+	document.onmousemove = (e)=>{
+		if(!dragger) return;
+		var pos = dragger.style.transform.split(',');
+		  	dragger.style.transform = "translate(" 
+		  + (Number(pos[0].substring(10, pos[0].length - 2)) + (e.movementX)) + "px,"
+		  + (Number(pos[1].substring(0, pos[1].length - 3)) + (e.movementY)) + "px)";
+	}
+	document.onmouseup = function(){
+		dragger = null;
+	}
+
+</script>
+
+</body>
+</html>

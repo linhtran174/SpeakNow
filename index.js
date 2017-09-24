@@ -13,6 +13,7 @@ require('peer').PeerServer({
     cert: fs.readFileSync('SSL_cert/xseed.tech.crt')
   }
 });
+
 //////////////////END INIT SERVER//////////////////////////
 var usersMap = new Map();
 
