@@ -1,0 +1,66 @@
+<html lang="en-VN">
+<head>
+<style>
+	button{
+		border: none;
+		height: 40px;
+	}
+	h3{
+		margin: 0;
+	}
+</style>
+
+</head>
+
+<body style="margin: 0;">
+	<div style="width: 30%; display: inline-block; height: 400px"></div>
+	<div style="width: 40%; display: inline-block;">
+		<h3> SpeakNOW!</h3>
+		Email: <input type="text" id="email"><br>
+	  	Password: <input type="text" id="password"><br>
+		<input type="submit" value="Login">
+		<input type="submit" value="SignUp">
+	</div>
+	<div style = "width: calc(30% - 8px); display: inline-block; height: 400px"></div>
+	
+
+<script type="text/javascript">
+	var activeTest = document.getElementById("part1Text");
+	function loadTest(testNumber){
+		activeTest.style.display = "none";
+		activeTest = document.getElementById("part"+testNumber+"Text");
+		activeTest.style.display = "";
+	}
+
+	navigator.getUserMedia({
+        video: true,
+        audio: true
+    }, function(stream) {
+        
+        var screen = document.getElementById('my-video');
+        screen.srcObject = stream;
+    },function(err) {
+        console.log(err);
+        alert('Không cho access camera thì gọi cái gì?');
+    });
+
+	var dragger = null;
+	document.getElementById("videoBox").onmousedown = (e)=>{
+		dragger = document.getElementById("videoBox");
+	}
+
+	document.onmousemove = (e)=>{
+		if(!dragger) return;
+		var pos = dragger.style.transform.split(',');
+		  	dragger.style.transform = "translate(" 
+		  + (Number(pos[0].substring(10, pos[0].length - 2)) + (e.movementX)) + "px,"
+		  + (Number(pos[1].substring(0, pos[1].length - 3)) + (e.movementY)) + "px)";
+	}
+	document.onmouseup = function(){
+		dragger = null;
+	}
+
+</script>
+
+</body>
+</html>
