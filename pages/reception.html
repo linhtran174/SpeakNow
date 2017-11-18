@@ -42,7 +42,7 @@
 			email : $("email").value,
 			password : $("password").value
 		};
-		send("POST", serverUrl + "/login", params, (response)=>{
+		send(serverUrl + "/login", params, (response)=>{
 			if(response.status == "success"){
 				localStorage['authToken'] = response.token;
 			}
@@ -57,7 +57,7 @@
 			email : $("email").value,
 			password : $("password").value
 		};
-		send("POST", serverUrl + "/signup", params, (response)=>{
+		send(serverUrl + "/signup", params, (response)=>{
 			if(response.status == "success"){
 				localStorage['authToken'] = response.token;
 			}
