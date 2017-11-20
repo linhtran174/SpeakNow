@@ -1,4 +1,5 @@
 var crypto = require('crypto');
+var jwt = require('jsonwebtoken');
 
 var md5 = (string)=>{
 	return crypto.createHash('md5').update(string).digest("hex");
@@ -26,10 +27,24 @@ module.exports = function(req, res, libs){
 				return;	
 			}
 
-			res.end(JSON.stringify({
-				message: "sign up success",
-				status : "success"
-			}));
+			jwt.sign({
+				user: email,
+				exp: Math.floor(Date.now()/1000) + 86400
+			}, libs.ssl.key, (err, token)=>{
+				if(err)	{
+					res.end(JSON.stringify({
+						message: err,
+						status : "failed"
+					}));
+					return;
+				}
+				res.end(JSON.stringify({
+					message: "sign up success",
+					token: token, 
+					status: "success"
+				}));
+			})
+			
 		})
 	})
 }

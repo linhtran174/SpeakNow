@@ -13,7 +13,7 @@
 </head>
 
 <body style="margin: 0;">
-	<div id="notiBox" style="display: none; position: fixed; padding: 7px; z-index: 10; top: 20px;"></div>
+	<div id="notiBox" style="opacity: 0.8; border-radius: 7px; display: none; position: fixed; padding: 7px; z-index: 10; top: 20px;"></div>
 
 	<div id="reception">
 		<div style="width: 30%; display: inline-block; height: 400px">
@@ -63,22 +63,23 @@
 			console.log(response)
 			if(response.status == "success"){
 				localStorage['authToken'] = response.token;
+				noti(response.message, "lightgreen", 4)
 			}
 			else{
-				noti(response.message, "lightpink")
+				noti(response.message, "lightpink", 4)
 			}
 		});
 	}
 
-	var notiBox = $("notiBox");
-	function noti(text, color){
+	var notiBox = $("notiBox")
+	function noti(text, color, timeoutSecond){
 		notiBox.style.backgroundColor = color;
 		notiBox.style.display = "block";
 		notiBox.innerHTML = text;
 		setTimeout(()=>{
 			notiBox.style.display = "none"
 			notiBox.style.backgroundColor = "white";
-		},4000)
+		}, timeout * 1000)
 	}
 
 </script>
