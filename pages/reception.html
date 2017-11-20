@@ -13,7 +13,7 @@
 </head>
 
 <body style="margin: 0;">
-	<div id="notiBox" stlye="display: none; padding: 7px; z-index: 10; top: 20px;"></div>
+	<div id="notiBox" style="display: none; position: fixed; padding: 7px; z-index: 10; top: 20px;"></div>
 
 	<div id="reception">
 		<div style="width: 30%; display: inline-block; height: 400px">
@@ -22,7 +22,7 @@
 			<div>Email:</div>
 			<input style="width: 100%" type="text" id="email"><br>
 		  	<div>Password:</div>
-		  	<input style="width: 100%" type="text" id="password"><br>
+		  	<input style="width: 100%" type="password" id="password"><br>
 			<input type="submit" value="Login" onclick="logIn(this)">
 			<input type="submit" value="Sign up" onclick="signUp(this)">
 		</div><div style = "width: 30%; display: inline-block; height: 400px">
@@ -43,35 +43,41 @@
 			password : $("password").value
 		};
 		send(serverUrl + "/login", params, (response)=>{
+			console.log(response);
 			if(response.status == "success"){
 				localStorage['authToken'] = response.token;
 			}
 			else{
-				noti(response.message, "red")
+				noti(response.message, "lightpink")
 			}
 		});
 	}
 
 	function signUp(){
+
 		var params = {
 			email : $("email").value,
 			password : $("password").value
 		};
 		send(serverUrl + "/signup", params, (response)=>{
+			console.log(response)
 			if(response.status == "success"){
 				localStorage['authToken'] = response.token;
 			}
 			else{
-				noti(response.message, "red")
+				noti(response.message, "lightpink")
 			}
 		});
 	}
 
 	var notiBox = $("notiBox");
 	function noti(text, color){
-		notiBox.style.display = "fixed";
+		notiBox.style.backgroundColor = color;
+		notiBox.style.display = "block";
+		notiBox.innerHTML = text;
 		setTimeout(()=>{
 			notiBox.style.display = "none"
+			notiBox.style.backgroundColor = "white";
 		},4000)
 	}
 
