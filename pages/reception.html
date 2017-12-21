@@ -8,34 +8,229 @@
 	h3{
 		margin: 0;
 	}
+
+	table, th, td {
+    	border: 1px solid white;
+    	color: white;
+	}
+	#dashboard a{
+		color: white;
+	}
 </style>
 
 </head>
 
-<body style="margin: 0;">
+<body style="margin: 0; background-color: #272822">
 	<div id="notiBox" style="opacity: 0.8; border-radius: 7px; display: none; position: fixed; padding: 7px; z-index: 10; top: 20px;"></div>
 
-	<div id="reception">
+	<div id="reception" style="background-color: #272822; color: white">
 		<div style="width: 30%; display: inline-block; height: 400px">
 		</div><div style="width: 40%; display: inline-block; vertical-align: top">
-			<h3 style="text-align: center"> SpeakNOW! - practice speaking with strangers</h3>
+			<h3 style="text-align: center; padding-top: 20px; padding-bottom: 20px"> SpeakNOW! - practice speaking with strangers</h3>
 			<div>Email:</div>
 			<input style="width: 100%" type="text" id="email"><br>
-		  	<div>Password:</div>
-		  	<input style="width: 100%" type="password" id="password"><br>
+			<div>Password:</div>
+			<input style="width: 100%" type="password" id="password"><br>
+			<div id="suLevel" style="display: none">
+				<p>Please select your approximate level (IELTS-based) to sign up:</p>
+				<select id ="suSelectLevel">
+					<option value="-1">[Select level]</option>
+					<option value="0">I don't know my current level</option>
+					<option value="1">IELTS 6 or below</option>
+					<option value="2">IELTS 6.5</option>
+					<option value="3">IELTS 7</option>
+					<option value="4">IELTS 7.5</option>
+					<option value="5">IELTS 8 or above</option>
+				</select>
+			</div>
 			<input type="submit" value="Login" onclick="logIn(this)">
 			<input type="submit" value="Sign up" onclick="signUp(this)">
+			<p>Or schedule an interview anonymously <span id = "schIntNow" style="color: red">NOW!!</span></p>
 		</div><div style = "width: 30%; display: inline-block; height: 400px">
 		</div>	
 	</div>
 
-	<div id ="dashboard"></div>
+	<div id ="dashboard" style="display: none">
+		<div id="dashboardControl" style="position: fixed; top: 0; width: 100%; height: 50px; color: white; background-color: #272822; padding: 0px 5px 0px 5px; border-bottom: 2px solid white">
+			<p style="display: inline-block" id="dashboardControl.name">Hi, friend!</p>
+
+			<a href="#" onclick="logOut()" style="float: right; padding-top: 15px; padding-right: 15px; color: white">Log out</a>
+			<a href="#" onclick="dashboard.navigateTo('viewSettings')" style="float: right; padding-top: 15px; padding-right: 10px; color: white">Settings</a>
+			<a href="#" onclick="dashboard.navigateTo('viewInterviews')" style="float: right; padding-top: 15px; padding-right: 10px; color: white" >Interviews</a>
+		</div>
+		<div id="dashboardContent" style="width: calc(100% - 10px); padding-top: 50px">
+			<div id="viewInterviews" style="width: 100%; padding: 0px 5px 0px 5px; color: white">
+				<button type="button" id="scheduleInterviewBtn" onclick="scheduleInterview()">Schedule an interview now!!!</button>
+				<p>UPCOMING INTERVIEWS</p>
+				<table style="width: 100%;">
+				  <tr>
+				    <th>Time</th>
+				    <th> </th>
+				  </tr>
+				  <tr>
+				    <td>Monday, 8:00AM</td>
+				    <td> </td>
+				  </tr>
+				</table>
+				<p>PAST INTERVIEWS</p>
+				<table style="width: 100%;">
+				  <tr>
+				    <th>Time</th>
+				    <th>Questions you were asked</th>
+				    <th>Questions you asked</th>
+				    <th>Rating</th>
+				  </tr>
+				  <tr>
+				    <td>Time</td>
+				    <td><a href="#">View</a></td>
+				    <td><a href="#">View</a></td>
+				    <td>5</td>
+				  </tr>
+				  <tr>
+				    <td>Time</td>
+				    <td><a>View</a></td>
+				    <td><a>View</a></td>
+				    <td>4</td>
+				  </tr>
+				</table>
+			</div>
+			<div id="viewSettings">
+				
+			</div>
+		</div>
+	</div>
 	
-	
+	<div id ="interview" style="display: none">
+		<div id="videoBox" style="position: fixed; top: 50px; right: 15px; width: 400px; height: 300px; min-width: 200px; cursor: move; border: 2px dotted black; transform: translate(0px,0px);">
+			<video id="incoming-video" style="position: relative; top:0; left: 0; width: 100%;" autoplay></video>
+			<!-- <p style="height: 100px">Peer's video will be placed here. This box can be dragged</p> -->
+			<video id="my-video" muted="true" style = "position: relative; bottom: 120px; left: 0; vertical-align: bottom; border: 2px solid black; width: 140px; min-width: 50px;" autoplay></video>
+		</div>
+		<!-- <div id="interviewer" style = "display: flex; flex-direction: column"> -->
+		<div id="controlPanel" style="width: 100%; height: 40px; border-bottom: 2px solid black; color: white; background-color: #373832">
+			<h3 style="display: inline-block; padding-top: 10px; padding-left: 150px; width: 300px">You are currently the interviewer.</h3>
+			<button style="float: right; margin-right: 20px; background-color: red; color: white;">End interview</button>
+			<button style="float: right; margin-right: 20px; background-color: blue; color: white">Swap role</button>
+		</div>
+		<div style="width: 100%; height: calc(100% - 42px);">
+			<div id="questionPanel" style="width: 40%; height: 100%; display: inline-block; border-right: 1px dotted black; background-color: #F9DFAE">
+			<div style="height: 30px; font-size:20px; background-color: #272822; color: white">Question & suggested answer</div>
+			<button id="part1" style="width: 32%; height: 30px; display: inline-block" onclick="loadTest(1)">Part 1</button>
+			<button id="part2" style="width: 32%; height: 30px; display: inline-block" onclick="loadTest(2)">Part 2</button>
+			<button id="part3" style="width: 32%; height: 30px; display: inline-block" onclick="loadTest(3)">Part 3</button>
+			<p id="part1Text" style="margin: 0; padding-top: 10px; padding-left: 6px; height: calc(100% - 74px); overflow-y: scroll;">
+				<b>What is your full name?</b><br>
+				My name is Asami Takashi <br>
+				<br>
+				<b>Can I see your ID?</b><br>
+				Yes, here's my identification. Do you work or study?<br>
+				<br>
+				<b>I am a student. What city are you from?</b><br>
+				I'm from Osaka<br>
+				<br>
+				<b>Where is it located exactly?</b><br>
+				Osaka is in the Kansai region of Honshu, Japan's main island. It is located on the Yodo River on Osaka Bay, it's the third largest city in Japan.  <br>
+				<br>
+				<b>Do you like living there?</b><br>
+				Yes, I do, I think it's a lovely place.  <br>
+				<br>
+				<b>Tell me some interesting facts about it.</b><br>
+				Okay, well, Osaka is considered to be one of the economic centers of Japan and in the past it was famous as a trading center, especially for rice, and was where the first modern futures market developed.<br>
+				<br>
+				<b>Are there many large cities in your country?</b><br>
+				Not all of them are large, I think there are ten cities which have more than 1 million people living in them. The three largest ones are Tokyo, then Yokohama, Osaka and Nagoya. These are the largest cities and have more than 2 million people living in them. The other cities are smaller. 
+
+				<b>What is your full name?</b><br>
+				My name is Asami Takashi <br>
+				<br>
+				<b>Can I see your ID?</b><br>
+				Yes, here's my identification. Do you work or study?<br>
+				<br>
+				<b>I am a student. What city are you from?</b><br>
+				I'm from Osaka<br>
+				<br>
+				<b>Where is it located exactly?</b><br>
+				Osaka is in the Kansai region of Honshu, Japan's main island. It is located on the Yodo River on Osaka Bay, it's the third largest city in Japan.  <br>
+				<br>
+				<b>Do you like living there?</b><br>
+				Yes, I do, I think it's a lovely place.  <br>
+				<br>
+				<b>Tell me some interesting facts about it.</b><br>
+				Okay, well, Osaka is considered to be one of the economic centers of Japan and in the past it was famous as a trading center, especially for rice, and was where the first modern futures market developed.<br>
+				<br>
+				<b>Are there many large cities in your country?</b><br>
+				Not all of them are large, I think there are ten cities which have more than 1 million people living in them. The three largest ones are Tokyo, then Yokohama, Osaka and Nagoya. These are the largest cities and have more than 2 million people living in them. The other cities are smaller. 
+			</p>
+			<p id="part2Text" style="margin: 0; padding-top: 10px; padding-left: 6px; height: calc(100% - 74px); overflow-y: scroll; display: none">
+				<b>Describe the thing that you cannot live without (except phone and internet). </b><br>
+				<br>
+				<br>
+				<b>Please say: </b><br>
+				- What is it?<br>
+				- Why can’t you manage without it?<br>
+				- How long have you had it for?<br>
+				- How did you feel when you were without it?<br>
+				<br>
+				<br>
+				<b>Sample answer:</b><br>
+				<br>
+				I would have to say my car. Public transport in Japan is not so conevenient and sometimes infrequent so havng a car is the preferred choice for getting around, especially if you have to travel to various places. I use my car mainly to go from my home to university and back. But at the moment I'm also workig as a part-time intern in a local business so I have to go there three afternoons a week as well. Trying to do all that by using public trasport would be almost impossible and would take a lot more time. I've had my car for about two years now, it's a Toyota Prius and I love it. It's very comfortable and well equipped and it's also easy to park and economical to run. I can't imagine having to do all the things I do normally without having my car.<br>
+				But a few months ago there was a problem with it. I noticed a strange noise coming from the front of the car one day. At first I ignored it, but then it gradually became worse and worse. I told my brother about it and he arranged for the car to be inspected by the mechanic. I'm not a very technical person , but apparently there was a problem with the suspension and they had to replace a part. That is the only problem I've ever had with it. The bad news was that they had to order the part specially and I was without my car for about ten days in total. It made my daily activities very difficult, and I didn't really like using the public transport at all. It wasted so much time.<br>
+				I was surprised how quickly I had gotten used to having my car and just how convenient it is. I hope that in the future I don't have any more problems with it. It really is an essential part of my life and I don't want to be without it again.
+			</p>
+			<p id="part3Text" style="margin: 0; padding-top: 10px; padding-left: 6px; height: calc(100% - 74px); overflow-y: scroll; display: none">
+			</p>
+			</div><div id="notepadPanel" style="width: calc(60% - 5px); height: 100%; display: inline-block; vertical-align: bottom">
+				<textarea id="personalNotePad" style="width: 100%; height: 50%; border: 0; border-bottom: 1px solid black; resize: none; display: inline-block; background-color: #272822; color: white; font-size: 18px; padding-top: 18px; padding-left: 10px">This is your personal notepad.
+Feel free to write anything you want here!
+				</textarea>
+				<textarea id="sharedNotePad" style="width: 100%; height: calc(50% - 2px); resize: none; border: 0; display: inline-block; background-color: #272822; color: white; font-size: 18px; padding-top: 18px; padding-left: 10px">This is your shared notepad.
+You peer can see what you write here!
+				</textarea>
+			</div>
+
+		</div>
+		<!-- </div> -->
+	</div>
+
+	<div id="findingInterview" style="display: none; text-align: center; color: white; padding-top: 200px;">
+		<svg width="200px"  height="200px"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="lds-radio" style="background: none;">
+	    	<circle cx="28" cy="75" r="11" ng-attr-fill="{{config.c1}}" fill="#c5523f">
+		      <animate attributeName="fill-opacity" calcMode="linear" values="0;1;1" keyTimes="0;0.2;1" dur="1" begin="0s" repeatCount="indefinite"></animate>
+		    </circle>
+		    <path d="M28 47A28 28 0 0 1 56 75" fill="none" ng-attr-stroke="{{config.c2}}" stroke-width="10" stroke="#f2b736">
+		      <animate attributeName="stroke-opacity" calcMode="linear" values="0;1;1" keyTimes="0;0.2;1" dur="1" begin="0.1s" repeatCount="indefinite"></animate>
+		    </path>
+		    <path d="M28 25A50 50 0 0 1 78 75" fill="none" ng-attr-stroke="{{config.c3}}" stroke-width="10" stroke="#499255">
+		      <animate attributeName="stroke-opacity" calcMode="linear" values="0;1;1" keyTimes="0;0.2;1" dur="1" begin="0.2s" repeatCount="indefinite"></animate>
+		    </path>
+		</svg>
+		<p>We are matching you with another peer for an interview. You will hear a bell ring when we found a match!<br>Feel free to do switch to other works while waiting... </p>
+	</div>
+
+
 <script type="text/javascript" src="/browserLib"></script>
 <script type="text/javascript">
-
 	var serverUrl = "https://xseed.tech";
+
+	var app = spa()
+	app.addPage("reception")
+	app.addPage("dashboard")
+	app.addPage("findingInterview")
+	app.addPage("interview")
+
+	app.navigateTo("reception")
+	if(localStorage['authToken']){
+		app.navigateTo("dashboard")
+		viewInterviews()
+	}
+		
+	draggable.add("videoBox")
+	draggable.add("my-video")
+
+	var dashboard = spa()
+	dashboard.addPage("viewInterviews")
+	dashboard.addPage("viewSettings")
 
 	function logIn(){
 		var params = {
@@ -43,43 +238,148 @@
 			password : $("password").value
 		};
 		send(serverUrl + "/login", params, (response)=>{
-			console.log(response);
+			displayServerResponse(response)
 			if(response.status == "success"){
 				localStorage['authToken'] = response.token;
-			}
-			else{
-				noti(response.message, "lightpink")
+				localStorage['email'] = response.email;
+				localStorage['id'] = response.id;
+
+				$('dashboardControl.name').innerHTML = "Hi, " + localStorage['email']
+				app.navigateTo("dashboard")
+				viewInterviews()	
 			}
 		});
 	}
 
 	function signUp(){
-
+		if ($("suSelectLevel").value == -1) {
+			$("suLevel").style.display = "block";
+			return;
+		}
 		var params = {
 			email : $("email").value,
-			password : $("password").value
+			password : $("password").value,
+			level: $("suSelectLevel").value
 		};
 		send(serverUrl + "/signup", params, (response)=>{
-			console.log(response)
+			displayServerResponse(response)
 			if(response.status == "success"){
 				localStorage['authToken'] = response.token;
-				noti(response.message, "lightgreen", 4)
-			}
-			else{
-				noti(response.message, "lightpink", 4)
+				localStorage['email'] = response.email;
+				localStorage['id'] = response.id;
+
+				$('dashboardControl.name').innerHTML = "Hi, " + localStorage['email']
+				app.navigateTo("dashboard")
+				viewInterviews()
 			}
 		});
 	}
 
-	var notiBox = $("notiBox")
-	function noti(text, color, timeoutSecond){
-		notiBox.style.backgroundColor = color;
-		notiBox.style.display = "block";
-		notiBox.innerHTML = text;
-		setTimeout(()=>{
-			notiBox.style.display = "none"
-			notiBox.style.backgroundColor = "white";
-		}, timeout * 1000)
+	function logOut(){
+		localStorage['authToken'] = ''
+		app.navigateTo('reception')
+	}
+
+	function viewInterviews(){
+		var params = {
+			token: localStorage['authToken'],
+		}
+		send(serverUrl + "/pastInterviews", displayServerResponse)
+	}
+
+	
+	function scheduleInterview(){
+		var ftp = $('freeTimePicker')
+		if(!ftp)
+			ftp = createScheduleTable()
+
+		if(ftp.value.size == 0) return;
+		// send(serverUrl + '', ,()=>{
+
+		// })
+	}
+
+	function createScheduleTable(){
+		var ftp = document.createElement('table')
+		ftp.id = 'freeTimePicker';
+		ftp.value = new Set()
+		$('scheduleInterviewBtn').parentNode.insertBefore(ftp, $('scheduleInterviewBtn'));
+
+		var now = new Date()
+		var tr = document.createElement('tr')
+		ftp.append(tr)
+		for(var i = 0; i < 7; i++){
+			var nDayFromNow = new Date(now.getYear(), now.getMonth(), now.getDate() + i + 1)
+			var th = document.createElement('th')
+			tr.append(th)
+			th.append(document.createTextNode(
+				nDayFromNow.getDate() + " / " + nDayFromNow.getMonth()
+			))
+		}
+
+		for(var i = 0; i < 16; i++){
+			var tr = document.createElement('tr')
+			ftp.append(tr)
+			for(var j = 0; j < 7; j++){
+				var td = document.createElement('td')
+				tr.append(td)
+				// id = time slot#i
+				td.id = "tSlot" + (14*i +j)
+				$(td.id).on('mouseenter', (e)=>{
+					if(e.style.backgroundColor == "")
+						e.style.backgroundColor = "blue"
+				})
+				$(td.id).on('mouseleave', (e)=>{
+					if(e.style.backgroundColor == "blue")
+						e.style.backgroundColor = ""
+				})
+
+				var timeSlot = new Date(now.getYear(), now.getMonth(), now.getDate() + i + 1, 8 + i)
+				td.value = timeSlot.getTime()
+				// var timeSlot = .getDate()
+				$(td.id).on('click', (e)=>{
+					if(e.style.backgroundColor == "green"){
+						e.style.backgroundColor = ""
+						ftp.value.delete(e.value)
+					}
+					else{
+						e.style.backgroundColor = "green"
+						ftp.value.add(e.value)
+					}
+				})
+				td.append(document.createTextNode(timeSlot.getHours() + ":00"))
+			}
+		}
+
+		return ftp;
+	}
+
+	var bell = new Audio("https://raw.githubusercontent.com/IonDen/ion.sound/master/sounds/bell_ring.mp3");
+	$("schIntNow").onclick = function(){
+		spa.navigateTo("findingInterview")
+
+		socket.send({interviewNow :{
+			peerId : localStorage['peerId'],
+			level : 0
+		}})
+		socket.on("interviewOffer", (m)=>{
+			console.log(m)
+			bell.play()
+			spa.navigateTo("interview")
+			if(m.initiator){
+				call(m.peerId)
+			}
+		})
+	}
+
+	function displayServerResponse(response){
+		console.log(response)
+		if(response.status == "success"){
+			noti(response.message, "lightgreen", 4)
+		}
+		else{
+			noti(response.message, "lightpink", 4)
+		}
 	}
 
 </script>

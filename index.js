@@ -1,87 +1,68 @@
-var uws = require('uws'),
-	httpsServer = require('./lib/initServer');
+var ws = require('ws'),
+	httpsServer = require('./lib/initHttpsServer')
+	config = require('./lib/config.js')
+	connectionService = require('./lib/connectionService.js')
+	fs = require('fs')
 
-var wss = new uws.Server({server: httpsServer});
+var wss = new ws.Server({server: httpsServer});
 
-var fs = require('fs');
+var sslCert = {
+	key: fs.readFileSync(config.sslCert.key),
+	cert: fs.readFileSync(config.sslCert.cert),
+	ca: fs.readFileSync(config.sslCert.ca)
+}
 
 //run peer server
 require('peer').PeerServer({
   port: 9000,
-  ssl: {
-    key: fs.readFileSync('SSL_cert/xseed.tech.key'),
-    cert: fs.readFileSync('SSL_cert/xseed.tech.crt')
-  }
+  ssl: sslCert
 });
+
+var libs = {
+	wss : wss,
+	sslCert	: sslCert
+}
+
+var interviewNowCtrl = require('./controllers/interviewNow.js')
 
 //////////////////END INIT SERVER//////////////////////////
 var usersMap = new Map();
 
-var processMessage = function(s, m){
+var messageRouter = function(s, m){
 	m = JSON.parse(m);
-	if(m.newUser){
-		if(usersMap.has(s) || usersMap.has(m.user.name)){
-			s.send(JSON.stringify({
-				userExisted: true,
-				name: m.user.name
-			}));
-		}
-		else{
-			usersMap.set(s, {name: m.user.name, peerId: m.user.peerId});
-			//console.log("registerSuccess");
-			s.send(JSON.stringify({
-				registerSuccess: true,
-				name: m.user.name
-			}));
-			wss.clients.forEach(
-			(peer)=>{
-				if(peer === s || peer.readyState !== uws.OPEN) return;
-				//console.log("addUser");
-				peer.send(JSON.stringify({
-					addUser: true,
-					user: m.user
-				}))
-			});
-		}
-		return;
-	}
-	if(m.getUserList){
-		var userList = [];
-		usersMap.forEach((user, socket)=>{
-			userList.push(user);
-		})
-		s.send(JSON.stringify({
-			userList : userList
-		}));
-		return;
+	if(m.interviewNow){
+		interviewNowCtrl(s, m, libs)
 	}
 }
 
-wss.on('disconnection', (me)=>{
-	console.log('disconnection');
-	wss.clients.forEach((client)=>{
-		if(client === me || client.readyState !== uws.OPEN) return;
-
-		client.send(JSON.stringify({
-			deleteUser : true,
-			user: usersMap.get(me)
-		}));
-	});
-});
-
-
-
 wss.on('connection', function(socket) {
-	console.log(socket);
+	// console.log(socket);
+
+	connectionService(socket)
+	
 	socket.on('message', (message)=>{
-		processMessage(socket, message);
+		messageRouter(socket, message);
 	});
+
+	
+
+
 });
 
-wss.on('message', ()=>{
-	console.log('message received!');
-});
+// setInterval(function ping() {
+//   wss.clients.forEach((s)=>{
+//     if (s.isAlive === false) return s.terminate();
+
+//     s.isAlive = false;
+//     s.ping('', false, true);
+//   });
+// }, 10000);
+
+// wss.on('message', ()=>{
+// 	console.log('message received!');
+// });
 
 wss.on('error', function(error) {
-    console.log('Cannot start server');
+    console.log('Cannot start server!. Error: ' + error);
 });
+

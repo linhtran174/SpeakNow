@@ -1,0 +1,19 @@
+- quan ly tai khoan
+	- doi mat khau
+	- doi ten 
+	- xoa tai khoan
+
+- quan ly interview:
+	- xem lai interview cu 
+	- 
+
+
+Các chức năng chi tiết:
+
+
+Chức năng tài khoản: đăng ký, đăng nhập
+Chức năng đăng ký lịch available, match và lên lịch một buổi học
+Chức năng xếp lịch sau nếu chưa xếp được ngay tức thời và thông báo
+Chức năng review sau một buổi học 
+Chức năng dashboard, xem lại những buổi học: Đề bài, note buổi học, review của bạn học cùng.
+Chức năng video chat + text chat hoặc là note pad ở trong phòng học.
