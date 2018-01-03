@@ -1,18 +1,16 @@
-var tests = null;
+const libs = require('../lib/config.js')
+var tests = require('../testData/tests.js');
 
 
-module.exports = function(req, res, libs){
+module.exports = function(req, res){
 	var db = libs.db;
-	// var wrongCredentialM = {status: "failed", message: "Got problem with your credentials! Please double check your typing!"};
-	if(tests == null){
-		db.query("SELECT * from ielttest", (err, docs, fields)=>{
-			tests = docs;
-		})	
+	if(!req.data.token){
+		randomTest = tests[randInt(0, tests.length - 1)]
+		res.end(JSON.stringify(randomTest))	
 	}
+	// var wrongCredentialM = {status: "failed", message: "Got problem with your credentials! Please double check your typing!"};
 	
-	randomTest = tests[randInt(0, tests.length)]
-
-	res.end(JSON.stringify(randomTest))
+	
 }
 
 function randInt(min, max) {

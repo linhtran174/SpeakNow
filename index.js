@@ -1,37 +1,27 @@
-var ws = require('ws'),
-	httpsServer = require('./lib/initHttpsServer')
-	config = require('./lib/config.js')
+var httpsServer = require('./lib/initHttpsServer')
+	libs = require('./lib/config.js')
 	connectionService = require('./lib/connectionService.js')
 	fs = require('fs')
 
-var wss = new ws.Server({server: httpsServer});
+var ws = require('ws'),
+	wss = new ws.Server({server: httpsServer});
 
-var sslCert = {
-	key: fs.readFileSync(config.sslCert.key),
-	cert: fs.readFileSync(config.sslCert.cert),
-	ca: fs.readFileSync(config.sslCert.ca)
-}
+libs.wss = wss
 
 //run peer server
 require('peer').PeerServer({
   port: 9000,
-  ssl: sslCert
+  ssl: libs.ssl
 });
 
-var libs = {
-	wss : wss,
-	sslCert	: sslCert
-}
-
 var interviewNowCtrl = require('./controllers/interviewNow.js')
-
 //////////////////END INIT SERVER//////////////////////////
 var usersMap = new Map();
 
 var messageRouter = function(s, m){
 	m = JSON.parse(m);
 	if(m.interviewNow){
-		interviewNowCtrl(s, m, libs)
+		interviewNowCtrl(s, m)
 	}
 }
 
@@ -43,9 +33,6 @@ wss.on('connection', function(socket) {
 	socket.on('message', (message)=>{
 		messageRouter(socket, message);
 	});
-
-	
-
 
 });
 

@@ -1,3 +1,4 @@
+const libs = require('../lib/config.js')
 
 var matchMakeThreshold = 10
 var interviewQueue = []
@@ -60,7 +61,7 @@ function matchMake(){
 	}
 }
 
-module.exports = function(socket, message, libs){
+module.exports = function(socket, message){
 	var db = libs.db;
 	var wss = libs.wss;
 	var m = message.interviewNow;

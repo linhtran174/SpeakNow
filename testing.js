@@ -1,4 +1,3 @@
-require('http').createServer((req, res) => {
-	console.log(req)
-	
-}).listen(80);
+var libs = require('lib/config.js')
+
+libs.db.query("INSERT INTO ieltsTest (?, ?, ?)")
