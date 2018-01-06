@@ -9,13 +9,15 @@ api['getInterviews'] = (req, res)=>{
 	if(!req.user) return;
 	
 	var u = req.user;
-	db.query("SELECT * FROM interviews WHERE participantIds like ?",
-	["%"+u.id+"%"],
+	db.query("SELECT * FROM interviews WHERE p1_id = ? or p2_id = ?",
+	[u.id, u.id],
 	(err, docs, fields)=>{
 		res.send({
 			status: "success",
 			interviews: docs,
 		})
+
+		// db.query("SELECT * FROM interviewsContent WHERE p1_id = ? or p2_id = ?", [u.id,u.id])
 	})
 	
 }
@@ -34,8 +36,8 @@ function sendOffer(p1, p2, interviewTime){
 
 	console.log('sending offer: interviewTime:', interviewTime)
 	//create interview
-	db.query("INSERT INTO interviews (interview_id, time, participantIds, status) values (?,?,?,?)", 
-	[interview_id, interviewTime.getTime()/1000, '[]', "scheduling"], (err, docs, fields)=>{
+	db.query("INSERT INTO interviews (interview_id, time, status) values (?,?,?)", 
+	[interview_id, interviewTime.getTime()/1000, "scheduling", p1.user.id, p2.user.id], (err, docs, fields)=>{
 		if(err) throw err
 	});
 
@@ -177,11 +179,19 @@ api['confirmInterview'] = (req, res)=>{
 		(err, docs, fields)=>{
 
 			if(docs[0].status == "scheduling"){
-				console.log(docs[0].participantIds)
-				var pIds = new Set(JSON.parse(docs[0].participantIds));	
-				pIds.add(user.id)
-				db.query("UPDATE interviews set status = ?, participantIds = ? where interview_id = ?",
-				[(pIds.size == 2)?"scheduled":"scheduling", JSON.stringify([...pIds]), decoded.interview_id], 
+				var p, status;
+				if(docs[0].p1_id){
+					p = 'p2_id';
+					status = "scheduled";
+				}
+				else{
+					p = 'p1_id';
+					status = "scheduling";	
+				}
+				
+
+				db.query("UPDATE interviews set status = ?, "+p+" = ? where interview_id = ?",
+				[status, user.id, decoded.interview_id], 
 				(err, result, fields)=>{
 					if(err) throw err;
 					res.send({status: "success", message: "We have received your confirmation :)"})

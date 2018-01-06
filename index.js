@@ -14,24 +14,21 @@ require('peer').PeerServer({
   ssl: libs.ssl
 });
 
-var interviewNowCtrl = require('./controllers/interviewNow.js')
+var roomCtrl = require('./controllers/rooms.js')
 //////////////////END INIT SERVER//////////////////////////
 var usersMap = new Map();
-
-var messageRouter = function(s, m){
-	m = JSON.parse(m);
-	if(m.interviewNow){
-		interviewNowCtrl(s, m)
-	}
-}
 
 wss.on('connection', function(socket) {
 	// console.log(socket);
 
 	connectionService(socket)
 	
+	socket.jsend = (thing)=>{
+		socket.send(JSON.stringify(thing))
+	}
+
 	socket.on('message', (message)=>{
-		messageRouter(socket, message);
+		roomCtrl(socket, JSON.parse(message));
 	});
 
 });
