@@ -7,8 +7,13 @@ var idToTest = {}
 module.exports = function(req, res){
 	var db = libs.db;
 	if(!req.data.token){
-		var randomTest = tests[randInt(0, tests.length - 1)]
-		res.send(randomTest)	
+		if(!req.data.testNumber){
+			var randomTest = tests[randInt(0, tests.length - 1)]
+			res.send(randomTest)
+		}
+		else{
+			res.send(tests[req.data.testNumber])
+		}
 	}
 	else{
 		jwt.verify(req.data.token, libs.ssl.key, (err, decoded)=>{

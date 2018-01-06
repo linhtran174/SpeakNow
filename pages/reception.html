@@ -41,6 +41,10 @@
 
 <body style="margin: 0; background-color: #272822; color: white">
 	<div id="notiBox" style="opacity: 0.8; color: black; border-radius: 7px; display: none; position: fixed; padding: 7px; z-index: 10; top: 20px;"></div>
+	<div id="viewQuestion" style="display: none; text-align:center; padding-top: 100px"></div>
+	<div id="viewNotepad" style="display: none; text-align:center; padding-top: 100px">
+		<textarea id="viewNotepad.text"></textarea>
+	</div>
 	<div id="rating" style="display: none; text-align: center; padding-top: 100px;">
 		<h2>Apart from the comments in your notepad, please also rate your peer!</h2>
 		<h2>Here are the things you should consider:</h2>
@@ -289,11 +293,63 @@ You can see each other writings here!
 		}
 		send(serverUrl + "/interviews", params, (response)=>{
 			$("upcomingInterviews").innerHTML = "<tr><th>Time</th><th>Status</th></tr>";
-			$("pastInterviews").innerHTML = "<tr><th>Time</th><th>Questions you were asked</th><th>Questions you asked</th><th>Rating</th></tr>";
+			$("pastInterviews").innerHTML = "<tr><th>Time</th><th>Questions you were asked</th><th>Questions you asked</th><th>Your notepad</th><th>Rating</th></tr>";
 
-			response.interviews.forEach((interview)=>{
+			response.interviews.forEach((interview, index)=>{
 				if(interview.status == "done"){
+					var row = document.createElement('tr');
+					var time = document.createElement('td');
+					$('pastInterviews').appendChild(row)
+					row.appendChild(time)
+					time.appendChild(document.createTextNode(
+						(new Date(interview.time * 1000)).toString()
+					))
+					var me = (localStorage.id == interview.p1_id)?"p1_":"p2_";
+					var peer =	(localStorage.id == interview.p1_id)?"p2_":"p1_";
+					var qwa     = document.createElement("td")
+					var qa      = document.createElement("td")
+					var notepad = document.createElement('td')
+					var rating  = document.createElement("td")
 
+					row.appendChild(qwa    )
+					row.appendChild(qa     )
+					row.appendChild(notepad)
+					row.appendChild(rating )
+				
+
+					if(interview[me+'question']){
+						// qa = createElement('button')
+						qa.innerHTML = "VIEW"
+						qa.value = interview[me+'question']
+						qa.id = "qa"+index;
+						$(qa.id).on("click", (e)=>{
+							viewQuestion(e.value)
+						})
+					}
+
+					if(interview[peer+'question']){
+						// qwa = document.createElement('button')
+						qwa.value = interview[me+'question']
+						qwa.innerHTML = "VIEW"
+						qwa.value = interview[me+'question']
+						qwa.id = "qwa"+index;
+						$(qwa.id).on("click", (e)=>{
+							viewQuestion(e.value)	
+						})
+					}
+
+					if(interview[me+"pad"]){
+						notepad.innerHTML = "VIEW"
+						notepad.value = interview[me+'question']
+						notepad.id = "notepad"+index;
+						$(notepad.id).on("click", (e)=>{
+							viewNotepad(e.value)
+						})
+					}
+					
+					if(interview[peer+"rating"])
+						rating.innerHTML = interview[peer+"rating"]
+					
 				}
 				else{
 					var row = document.createElement('tr');
@@ -327,6 +383,18 @@ You can see each other writings here!
 		})
 	}
 
+	function viewQuestion(qid){
+		app.navigateTo('viewQuestion')
+		send(serverUrl+"/ieltsTests", {testNumber: qid}, (response)=>{
+			$('viewQuestion').innerHTML = response.part1;
+		})
+	}
+
+	function viewNotepad(content){
+		app.navigateTo('viewNotepad');
+		$('viewNotepad.text').value = content;
+	}
+
 	
 	function joinInterview(interview_id){
 		socket.send({
@@ -341,19 +409,7 @@ You can see each other writings here!
 
 		socket.on("startInterview", (m)=>{
 			startInterview(m, ()=>{
-				noti("Either you or your peer ended the interview!", "blue", 3)
-				app.navigateTo('rating')
-				$('rating.submit').onclick = ()=>{
-					send(serverUrl + '/interviews', {
-						api: "recordInterview",
-						token: localStorage['authToken'],
-						test: response.id,
-						rating: $('ratingStars').value,
-						notepad: $('personalNotePad').value
-					}, displayServerResponse)
-					app.navigateTo('dashboard')
-					viewInterviews()
-				}
+				
 			})
 		})
 
@@ -361,6 +417,23 @@ You can see each other writings here!
 			$('part1Text').innerHTML = response.part1;
 			$('part2Text').innerHTML = response.part2;
 			$('part3Text').innerHTML = response.part3;
+
+			onEndCall = function(){
+				noti("Either you or your peer ended the interview!", "blue", 3)
+				app.navigateTo('rating')
+				$('rating.submit').onclick = ()=>{
+					send(serverUrl + '/interviews', {
+						api: "recordInterview",
+						token: localStorage['authToken'],
+						interview_id: interview_id,
+						test: response.id,
+						rating: $('ratingStars').value,
+						notepad: $('personalNotePad').value
+					}, displayServerResponse)
+					app.navigateTo('dashboard')
+					viewInterviews()
+				}	
+			}
 		})
 	}
 
@@ -480,18 +553,17 @@ You can see each other writings here!
 		})
 
 		socket.on("interviewOffer", (offer)=>{
-			startInterview(offer, ()=>{
+			startInterview(offer)
+			onEndCall = function(){
 				noti("Interview ended by either you or your peer!!", "blue", 5)
 		    	app.navigateTo("reception")
-			})
+			}
 		})
 	}
 
-	function startInterview(interviewOffer, endInterviewCallback){
+	function startInterview(interviewOffer){
 		console.log(interviewOffer)
 		bell.play()
-		
-		onEndCall = endInterviewCallback
 
 		if(interviewOffer.initiator) call(interviewOffer.peerId)
 		$('interview.roleText').role = interviewOffer.initiator?"interviewer":"interviewee";
@@ -560,7 +632,7 @@ You can see each other writings here!
 				$('s'+i).innerHTML = "&#x2605;";	
 			}
 			else{
-				$('s'+i).style.color = "transparent";
+				$('s'+i).style.color = "white";
 				$('s'+i).innerHTML = "&#x2606;";
 			}
 		}
