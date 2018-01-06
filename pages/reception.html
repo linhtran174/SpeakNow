@@ -491,12 +491,9 @@ You can see each other writings here!
 		console.log(interviewOffer)
 		bell.play()
 		
-		call(interviewOffer.peerId, interviewOffer.initiator, (vStream, dStream)=>{
-			vStream.on('close', function(remoteStream){
-		    	endInterview()
-		    	endInterviewCallback()
-		    })
-		})
+		onEndCall = endInterviewCallback
+
+		if(interviewOffer.initiator) call(interviewOffer.peerId)
 		$('interview.roleText').role = interviewOffer.initiator?"interviewer":"interviewee";
 
 		app.navigateTo("interview")
@@ -557,9 +554,15 @@ You can see each other writings here!
 	
 	function r(num){
 		$('ratingStars').value = num;
-		for(var i = 1; i <= num; i++){
-			$('s'+i).style.color = "gold"
-			$('s'+i).style.content = "\2605"
+		for(var i = 1; i <= 5; i++){
+			if(i<=num){
+				$('s'+i).style.color = "gold";
+				$('s'+i).innerHTML = "&#x2605;";	
+			}
+			else{
+				$('s'+i).style.color = "transparent";
+				$('s'+i).innerHTML = "&#x2606;";
+			}
 		}
 	}
 
