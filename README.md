@@ -1,6 +1,6 @@
-# video-chat-peerjs
+# speakNow
 
-A small application based on WebRTC that allows people to register with a name and quickly video call any of the registered others https://xseed.tech
+A small web application based on WebRTC that allows english learners to get instantly matched-up with anonymous peers and practice English https://xseed.tech
 
 ```
 npm install
