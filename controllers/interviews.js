@@ -25,10 +25,9 @@ api['recordInterview'] = (req, res)=>{
 
 	db.query("SELECT * from interviews where interview_id =?" , [req.data.interview_id], 
 		(err, results, fields)=>{
-		p = (u.id == results[0].p1_id)?"p1_":"p2_"
-		db.query("UPDATE interviews SET status = ?, "+
-		p+"question = ?,"+p+"rating = ? where interview_id = ?",
-		["done", req.data.test, req.data.rating, req.data.interviews_id],
+		p = (u.id == results[0].p1_id)?"p1_":"p2_";
+		var query = "UPDATE interviews SET status = ?, "+p+"question = ?,"+p+"rating = ? where interview_id = ?";
+		db.query(query, ["done", req.data.test, req.data.rating, req.data.interview_id],
 		(err, docs, fields)=>{
 			if(err) res.send({status: "failed", message: err})
 			res.send({
