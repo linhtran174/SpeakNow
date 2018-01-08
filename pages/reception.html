@@ -387,7 +387,10 @@ You can see each other writings here!
 	function viewQuestion(qid){
 		app.navigateTo('viewQuestion')
 		send(serverUrl+"/ieltsTests", {testNumber: qid}, (response)=>{
-			$('viewQuestion').innerHTML = response.part1;
+			$('viewQuestion').innerHTML = 
+			"<h2 style='color: black'>Part 1</h2><br><br>" + response.part1 + "<br><br>" +
+			"<h2 style='color: black'>Part 2</h2><br><br>" + response.part2 + "<br><br>" +
+			"<h2 style='color: black'>Part 3</h2><br><br>" + response.part3 + "<br><br>";
 		})
 	}
 
