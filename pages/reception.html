@@ -41,9 +41,9 @@
 
 <body style="margin: 0; background-color: #272822; color: white">
 	<div id="notiBox" style="opacity: 0.8; color: black; border-radius: 7px; display: none; position: fixed; padding: 7px; z-index: 10; top: 20px;"></div>
-	<div id="viewQuestion" style="display: none; text-align:center; padding-top: 100px"></div>
+	<div id="viewQuestion" style="display: none; text-align:center; padding-top: 100px; background-color: wheat"></div>
 	<div id="viewNotepad" style="display: none; text-align:center; padding-top: 100px">
-		<textarea id="viewNotepad.text"></textarea>
+		<textarea id="viewNotepad.text" style="width: 60%; height: 60%;"></textarea>
 	</div>
 	<div id="rating" style="display: none; text-align: center; padding-top: 100px;">
 		<h2>Apart from the comments in your notepad, please also rate your peer!</h2>
@@ -96,7 +96,7 @@
 			<div id="viewInterviews" style="width: 100%; padding: 0px 5px 0px 5px; color: white">
 				<button type="button" id="scheduleInterviewBtn" onclick="scheduleInterview()">Schedule an interview now!!!</button>
 				<p>UPCOMING INTERVIEWS</p>
-				<table id="upcomingInterviews" style="width: 100%;">
+				<table id="upcomingInterviews" style="width: 100%; text-align: center">
 				  <tr>
 				    <th>Time</th>
 				    <th>Status</th>
@@ -144,7 +144,7 @@
 		<!-- <div id="interviewer" style = "display: flex; flex-direction: column"> -->
 		<div id="controlPanel" style="width: 100%; height: 40px; border-bottom: 2px solid black; color: white; background-color: #373832">
 			<h3 id="interview.roleText" style="display: inline-block; padding-top: 10px; padding-left: 150px; width: 320px">You are currently the interviewer.</h3>
-			<button id="interview.endInterview" onclick="endInterview()" style="float: right; margin-right: 20px; background-color: red; color: white;">End interview</button>
+			<button id="interview.endInterview" onclick="stopStreams()" style="float: right; margin-right: 20px; background-color: red; color: white;">End interview</button>
 			<button id="interview.swapRole" style="float: right; margin-right: 20px; background-color: blue; color: white">Swap role</button>
 		</div>
 		<div style="width: 100%; height: calc(100% - 42px);">
@@ -329,9 +329,8 @@ You can see each other writings here!
 
 					if(interview[peer+'question']){
 						// qwa = document.createElement('button')
-						qwa.value = interview[me+'question']
+						qwa.value = interview[peer+'question']
 						qwa.innerHTML = "VIEW"
-						qwa.value = interview[me+'question']
 						qwa.id = "qwa"+index;
 						$(qwa.id).on("click", (e)=>{
 							viewQuestion(e.value)	
@@ -340,7 +339,7 @@ You can see each other writings here!
 
 					if(interview[me+"pad"]){
 						notepad.innerHTML = "VIEW"
-						notepad.value = interview[me+'question']
+						notepad.value = interview[me+'pad']
 						notepad.id = "notepad"+index;
 						$(notepad.id).on("click", (e)=>{
 							viewNotepad(e.value)
@@ -353,21 +352,25 @@ You can see each other writings here!
 				}
 				else{
 					var row = document.createElement('tr');
+					$('upcomingInterviews').appendChild(row);
 					var time = document.createElement('td');
-					
+					row.appendChild(time)
+					var status = document.createElement('td');
+					row.appendChild(status)
+
 					time.appendChild(document.createTextNode(
 						(new Date(interview.time * 1000)).toString()
 					))
 
-					var status = document.createElement('td');
-
 					var now = (new Date()).getTime() / 1000;
 					if(Math.abs(now - interview.time) < 600){ //10 minutes
 						var button = document.createElement('button');
-						button.interview_id = interview.interview_id;
-						button.on("click", (e)=>joinInterview(e.interview_id));
-						button.appendChild(document.createTextNode("Join interview now!!"))
 						status.appendChild(button);
+						button.id = "ji_" + interview.interview_id;
+						button.interview_id = interview.interview_id;
+						$(button.id).on("click", (e)=>joinInterview(e.interview_id));
+						button.appendChild(document.createTextNode("Join interview now!!"))
+						
 					}
 					else{
 						status.appendChild(document.createTextNode(
@@ -375,9 +378,7 @@ You can see each other writings here!
 							"Waiting peer confirmation":"Confirmed"
 						))
 					}
-					row.appendChild(time)
-					row.appendChild(status)
-					$('upcomingInterviews').appendChild(row);					
+					
 				}
 			})
 		})
@@ -419,6 +420,7 @@ You can see each other writings here!
 			$('part3Text').innerHTML = response.part3;
 
 			onEndCall = function(){
+				stopStreams()
 				noti("Either you or your peer ended the interview!", "blue", 3)
 				app.navigateTo('rating')
 				$('rating.submit').onclick = ()=>{
@@ -555,6 +557,7 @@ You can see each other writings here!
 		socket.on("interviewOffer", (offer)=>{
 			startInterview(offer)
 			onEndCall = function(){
+				stopStreams()
 				noti("Interview ended by either you or your peer!!", "blue", 5)
 		    	app.navigateTo("reception")
 			}
@@ -585,7 +588,7 @@ You can see each other writings here!
 		})
 	})
 
-	function endInterview(){
+	function stopStreams(){
 		if(__activeCall){
 			__activeCall.close()
 		}
