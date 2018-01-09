@@ -43,6 +43,7 @@
 	<div id="notiBox" style="opacity: 0.8; color: black; border-radius: 7px; display: none; position: fixed; padding: 7px; z-index: 10; top: 20px;"></div>
 	<div id="viewQuestion" style="display: none; text-align:center; padding-top: 100px; background-color: wheat"></div>
 	<div id="viewNotepad" style="display: none; text-align:center; padding-top: 100px">
+		<button style='font-size: 20px' onclick="app.navigateTo('dashboard')">X</button>
 		<textarea id="viewNotepad.text" style="width: 60%; height: 60%;"></textarea>
 	</div>
 	<div id="rating" style="display: none; text-align: center; padding-top: 100px;">
@@ -195,6 +196,9 @@ You can see each other writings here!
 	app.addPage("findingInterview")
 	app.addPage("interview")
 	app.addPage("rating")
+	app.addPage("viewQuestion")
+	app.addPage("viewNotepad")
+
 
 	app.navigateTo("reception")
 
@@ -388,6 +392,7 @@ You can see each other writings here!
 		app.navigateTo('viewQuestion')
 		send(serverUrl+"/ieltsTests", {testNumber: qid}, (response)=>{
 			$('viewQuestion').innerHTML = 
+			"<button style='font-size: 20px' onclick='app.navigateTo(\"dashboard\")'>X</button>" +
 			"<h2 style='color: black'>Part 1</h2><br><br>" + response.part1 + "<br><br>" +
 			"<h2 style='color: black'>Part 2</h2><br><br>" + response.part2 + "<br><br>" +
 			"<h2 style='color: black'>Part 3</h2><br><br>" + response.part3 + "<br><br>";
