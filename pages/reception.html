@@ -1,6 +1,16 @@
 <html lang="en-VN">
 <head>
 <style>
+	td, th {padding: 5px;}
+	select{margin-bottom: 5px}
+	table{margin-bottom: 5px}
+	input{
+		padding: 5px;
+		margin-bottom: 7px;
+	}
+	select{
+		padding: 5px;
+	}
 	button{
 		border: none;
 		height: 40px;
@@ -40,7 +50,7 @@
 </head>
 
 <body style="margin: 0; background-color: #272822; color: white">
-	<div id="notiBox" style="opacity: 0.8; color: black; border-radius: 7px; display: none; position: fixed; padding: 7px; z-index: 10; top: 20px;"></div>
+	<div id="notiBox" style="opacity: 0.8; color: black; font-weight: bold; border-radius: 7px; display: none; position: fixed; padding: 10px; z-index: 10; top: 20px;"></div>
 	<div id="viewQuestion" style="display: none; text-align:center; padding-top: 100px; background-color: wheat"></div>
 	<div id="viewNotepad" style="display: none; text-align:center; padding-top: 100px">
 		<button style='font-size: 20px' onclick="app.navigateTo('dashboard')">X</button>
@@ -68,7 +78,7 @@
 			<input style="width: 100%" type="password" id="password"><br>
 			<div id="suLevel" style="display: none">
 				<p id="suLevel.text">Please select your approximate level (IELTS-based) to sign up:</p>
-				<select id ="suSelectLevel">
+				<select id ="suSelectLevel" style="width: 100%">
 					<option value="-1">[Select level]</option>
 					<option value="0">I don't know my current level</option>
 					<option value="1">IELTS 6 or below</option>
@@ -78,8 +88,8 @@
 					<option value="5">IELTS 8 or above</option>
 				</select>
 			</div>
-			<input type="submit" value="Login" onclick="logIn(this)">
-			<input type="submit" value="Sign up" onclick="signUp(this)">
+			<input type="submit" value="Login" style="background-color: lightblue; font-weight: bold; width:calc(50% - 4px)" onclick="logIn(this)">
+			<input type="submit" value="Sign up" style="background-color: lightgreen; font-weight: bold; width: 50%;" onclick="signUp(this)">
 			<p>Or schedule an interview without an account <span id = "schIntNow" style="color: red; font-size: 25px">NOW!!</span></p>
 		</div><div style = "width: 30%; display: inline-block; height: 400px">
 		</div>
@@ -93,9 +103,9 @@
 			<a href="#" onclick="viewSettings()" style="float: right; padding-top: 15px; padding-right: 10px; color: white">Settings</a>
 			<a href="#" onclick="viewInterviews()" style="float: right; padding-top: 15px; padding-right: 10px; color: white" >Interviews</a>
 		</div>
-		<div id="dashboardContent" style="width: calc(100% - 10px); padding-top: 50px">
+		<div id="dashboardContent" style="width: calc(100% - 10px); padding-top: 60px">
 			<div id="viewInterviews" style="width: 100%; padding: 0px 5px 0px 5px; color: white">
-				<button type="button" id="scheduleInterviewBtn" onclick="scheduleInterview()">Schedule an interview now!!!</button>
+				<button type="button" id="scheduleInterviewBtn" style="width:100%; background-color: #fff743; font-weight: bold; font-size: large;" onclick="scheduleInterview()">Schedule an interview now!!!</button>
 				<p>UPCOMING INTERVIEWS</p>
 				<table id="upcomingInterviews" style="width: 100%; text-align: center">
 				  <tr>
@@ -104,7 +114,7 @@
 				  </tr>
 				</table>
 				<p>PAST INTERVIEWS</p>
-				<table id="pastInterviews" style="width: 100%;">
+				<table id="pastInterviews" style="width: 100%; text-align: center">
 				  <tr>
 				    <th>Time</th>
 				    <th>Questions you were asked</th>
@@ -350,9 +360,14 @@ You can see each other writings here!
 						})
 					}
 					
-					if(interview[peer+"rating"])
-						rating.innerHTML = interview[peer+"rating"]
-					
+					if(interview[peer+"rating"]){
+						var count = interview[peer+"rating"];
+						var html = ""
+						for (var i = 0; i < count; i++){
+							html += "<span style='color: gold'>&#x2605;</span>"
+						}
+						rating.innerHTML = html;
+					}
 				}
 				else{
 					var row = document.createElement('tr');
@@ -372,6 +387,7 @@ You can see each other writings here!
 						status.appendChild(button);
 						button.id = "ji_" + interview.interview_id;
 						button.interview_id = interview.interview_id;
+						button.style.backgroundColor = "rgb(0, 212, 0)";
 						$(button.id).on("click", (e)=>joinInterview(e.interview_id));
 						button.appendChild(document.createTextNode("Join interview now!!"))
 						
@@ -483,11 +499,15 @@ You can see each other writings here!
 		ftp.parentNode.removeChild(ftp)
 	}
 
+	var __color_selected = "rgb(0, 212, 0)"
+	var __color_focused = "blue";
 	function createScheduleTable(){
 		var ftp = document.createElement('table')
-		ftp.id = 'freeTimePicker';
-		ftp.value = new Set()
 		$('scheduleInterviewBtn').parentNode.insertBefore(ftp, $('scheduleInterviewBtn'));
+		ftp.id = 'freeTimePicker';
+		ftp.style.width = "100%";
+		ftp.style.textAlign = "center";
+		ftp.value = new Set()
 
 		var now = new Date()
 		var tr = document.createElement('tr')
@@ -497,7 +517,7 @@ You can see each other writings here!
 			var th = document.createElement('th')
 			tr.append(th)
 			th.append(document.createTextNode(
-				nDayFromNow.getDate() + " / " + (nDayFromNow.getMonth() + 1)
+				nDayFromNow.toString().substr(0, 3) + ", " + nDayFromNow.getDate() + "/" + (nDayFromNow.getMonth() + 1)
 			))
 		}
 
@@ -522,12 +542,12 @@ You can see each other writings here!
 				td.value = timeSlot.getTime()/1000
 				// var timeSlot = .getDate()
 				$(td.id).on('click', (e)=>{
-					if(e.style.backgroundColor == "green"){
+					if(e.style.backgroundColor == __color_selected){
 						e.style.backgroundColor = ""
 						ftp.value.delete(e.value)
 					}
 					else{
-						e.style.backgroundColor = "green"
+						e.style.backgroundColor = __color_selected
 						ftp.value.add(e.value)
 					}
 				})
