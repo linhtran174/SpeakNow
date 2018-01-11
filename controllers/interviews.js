@@ -58,7 +58,7 @@ function sendOffer(p1, p2, interviewTime){
 		user: p1.user,
 	}, libs.ssl.key, (err, token)=>{
 
-		libs.sendmail({
+		libs.sendMail({
 			from: 'linh@xseed.tech',
 			to: p1.user.email,
 			subject: 'Hi, ' + p1.user.email.split('@')[0] + ' we have found a peer for you',
@@ -73,7 +73,7 @@ function sendOffer(p1, p2, interviewTime){
 		interview_id: interview_id,
 		user: p2.user,
 	}, libs.ssl.key, (err, token)=>{
-		libs.sendmail({
+		libs.sendMail({
 			from: 'linh@xseed.tech',
 			to: p2.user.email,
 			subject: 'Hi, ' + p2.user.email.split('@')[0] + ' we have found a peer for you',

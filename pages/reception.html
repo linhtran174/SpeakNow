@@ -513,7 +513,7 @@ You can see each other writings here!
 		var tr = document.createElement('tr')
 		ftp.append(tr)
 		for(var i = 0; i < 7; i++){
-			var nDayFromNow = new Date(now.getYear(), now.getMonth(), now.getDate() + i + 1)
+			var nDayFromNow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i + 1)
 			var th = document.createElement('th')
 			tr.append(th)
 			th.append(document.createTextNode(
