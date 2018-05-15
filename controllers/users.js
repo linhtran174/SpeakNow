@@ -17,7 +17,7 @@ api['login'] = function(req, res){
 	db.query("SELECT * FROM users where email = ?", [email],
 	(err, docs, fields)=>{
 		if(err) {
-			res.end({status: "failed", message: err}) 
+			res.send({status: "failed", message: err}) 
 			return;
 		}
 

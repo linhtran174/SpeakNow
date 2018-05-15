@@ -18,8 +18,12 @@
   },
   "homepage": "https://github.com/linhtran174/video-chat-peerjs#readme",
   "dependencies": {
+    "jsonwebtoken": "^8.2.1",
+    "mysql": "^2.15.0",
+    "nodemon": "^1.17.4",
     "peer": "^0.2.8",
-    "ws": "^3.0.0",
-    "sendmail": "^1.2.0"
+    "sendmail": "^1.2.0",
+    "shortid": "^2.2.8",
+    "ws": "^3.0.0"
   }
 }
