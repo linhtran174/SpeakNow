@@ -3,16 +3,17 @@ var httpsServer = require('./lib/initHttpsServer')
 	connectionService = require('./lib/connectionService.js')
 	fs = require('fs')
 
+/*
 var ws = require('ws'),
 	wss = new ws.Server({server: httpsServer});
 
 libs.wss = wss
 
 //run peer server
-require('peer').PeerServer({
-  port: 9000,
-  ssl: libs.ssl
-});
+// require('peer').PeerServer({
+//   port: 9000,
+//   ssl: libs.ssl
+// });
 
 var roomCtrl = require('./controllers/rooms.js')
 //////////////////END INIT SERVER//////////////////////////
@@ -50,3 +51,4 @@ wss.on('error', function(error) {
     console.log('Cannot start server!. Error: ' + error);
 });
 
+*/
