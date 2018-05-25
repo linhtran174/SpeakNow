@@ -9,7 +9,7 @@ var ws = require('ws'),
 
 libs.wss = wss
 
-run peer server
+//run peer server
 require('peer').PeerServer({
   port: process.argv[3],
   ssl: libs.ssl
