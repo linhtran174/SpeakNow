@@ -1,20 +1,21 @@
-const fs = require('fs');
-const db = require('mysql').createConnection({
-	host: 'localhost',
+var fs = require('fs');
+
+var db = require('mysql').createConnection({
+	host: 'localhost', 
 	user: 'root',
 	password: '1',
-	database: 'speakNow'
-});
-db.connect();
+	database: 'speaknow',
+})
+db.connect()
 
 module.exports = {
 	ssl: {
-		key: fs.readFileSync("../SSL_cert/privkey.pem"),
-		cert: fs.readFileSync("../SSL_cert/cert.pem"),
-		ca: fs.readFileSync("../SSL_cert/fullchain.pem")
+		cert: fs.readFileSync("/etc/letsencrypt/live/xseed.tech/cert.pem"),
+		key: fs.readFileSync("/etc/letsencrypt/live/xseed.tech/privkey.pem"),
+		ca: fs.readFileSync("/etc/letsencrypt/live/xseed.tech/fullchain.pem")
 	},
 
-	db: db
-}
+	db: db,
 
-//console.log(module.export.ssl)
+	uid: require('shortid')
+}
